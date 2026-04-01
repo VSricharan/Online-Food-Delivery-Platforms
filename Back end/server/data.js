@@ -107,7 +107,7 @@ module.exports = {
         avgOrderValue: Math.round(avgCost * 100) / 100,
         satisfactionScore: satisfactionPct,
         predictedDemand: Math.round(totalOrders * 1.23),
-        preferences: 14,
+        activeDeliveries: Math.round(totalOrders * 0.022),
     },
     charts: {
         ordersByHour,

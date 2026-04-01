@@ -256,6 +256,31 @@ function toggleMobileMenu() {
     closeIcon.style.display = isHidden ? 'block' : 'none';
 }
 
+// ─── #9: Parallax Scroll on Hero Orbs ────────────────────────────────────────
+function setupParallax() {
+    const heroSection = document.getElementById('home');
+    if (!heroSection) return;
+    const orbs = heroSection.querySelectorAll('.animate-drift-1, .animate-drift-2, .animate-drift-3');
+    if (orbs.length === 0) return;
+
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            requestAnimationFrame(() => {
+                const sy = window.scrollY;
+                if (sy < window.innerHeight * 1.5) {
+                    orbs.forEach((orb, i) => {
+                        const rate = 0.03 + i * 0.02;
+                        orb.style.transform = `translateY(${sy * rate}px)`;
+                    });
+                }
+                ticking = false;
+            });
+            ticking = true;
+        }
+    }, { passive: true });
+}
+
 // ─── Init ───────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
     renderFeatures();
@@ -264,4 +289,5 @@ document.addEventListener('DOMContentLoaded', () => {
     setupScrollReveal();
     setupCountUp();
     setupNavbar();
+    setupParallax();
 });

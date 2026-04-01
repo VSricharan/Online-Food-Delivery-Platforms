@@ -296,7 +296,19 @@ async function handleSignIn() {
         localStorage.setItem('token', res.token);
         localStorage.setItem('user', JSON.stringify(res.user));
         pushSystemLog('AUTH', `User ${res.user.name} (${res.user.role}) authenticated successfully.`, 'text-blue-400');
-        window.location.href = 'dashboard.html';
+
+        // #13: Celebration exit animation
+        btnText.textContent = 'Welcome!';
+        spinner.classList.add('hidden');
+        btn.style.background = '#22C55E';
+        const formContainer = document.querySelector('.w-full.max-w-md') || btn.closest('form');
+        if (formContainer) {
+            formContainer.classList.add('login-success-exit');
+            setTimeout(() => { window.location.href = 'dashboard.html'; }, 500);
+        } else {
+            window.location.href = 'dashboard.html';
+        }
+        return;
     } catch (err) {
         const msg = err?.response?.data?.error || err?.response?.data?.message || 'Login failed. Please try again.';
         errorDiv.textContent = msg;

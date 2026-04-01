@@ -134,9 +134,15 @@ function toggleSidebar() {
 // ─── Section switching ──────────────────────────────────────────────────────
 function setActiveSection(id) {
     activeSection = id;
-    document.querySelectorAll('.section-content').forEach(el => el.classList.add('hidden'));
+    document.querySelectorAll('.section-content').forEach(el => {
+        el.classList.add('hidden');
+        el.classList.remove('animate-fade-in', 'animate-section-enter');
+    });
     const target = document.getElementById('section-' + id);
-    if (target) { target.classList.remove('hidden'); target.classList.add('animate-fade-in'); }
+    if (target) {
+        target.classList.remove('hidden');
+        target.classList.add('animate-section-enter');
+    }
     document.getElementById('topbar-title').textContent = id;
 
     const globalSearch = document.getElementById('global-search-container');
@@ -157,18 +163,39 @@ function setActiveSection(id) {
     if (id === 'settings' && !target.dataset.loaded) { renderSettings(); target.dataset.loaded = '1'; }
 }
 
-// ─── Dropdowns ──────────────────────────────────────────────────────────────
+// ─── Dropdowns (Spring Animated) ──────────────────────────────────────────────
+function animateDropdown(el, show) {
+    if (show) {
+        el.classList.remove('hidden', 'dropdown-spring-exit');
+        el.classList.add('dropdown-spring-enter');
+    } else {
+        el.classList.remove('dropdown-spring-enter');
+        el.classList.add('dropdown-spring-exit');
+        el.addEventListener('animationend', () => {
+            if (el.classList.contains('dropdown-spring-exit')) {
+                el.classList.add('hidden');
+                el.classList.remove('dropdown-spring-exit');
+            }
+        }, { once: true });
+    }
+}
 function closeDropdowns() {
-    document.getElementById('notif-dropdown').classList.add('hidden');
-    document.getElementById('profile-dropdown').classList.add('hidden');
+    const notif = document.getElementById('notif-dropdown');
+    const profile = document.getElementById('profile-dropdown');
+    if (!notif.classList.contains('hidden')) animateDropdown(notif, false);
+    if (!profile.classList.contains('hidden')) animateDropdown(profile, false);
 }
 function toggleNotifications() {
-    document.getElementById('profile-dropdown').classList.add('hidden');
-    document.getElementById('notif-dropdown').classList.toggle('hidden');
+    const notif = document.getElementById('notif-dropdown');
+    const profile = document.getElementById('profile-dropdown');
+    if (!profile.classList.contains('hidden')) animateDropdown(profile, false);
+    animateDropdown(notif, notif.classList.contains('hidden'));
 }
 function toggleProfileMenu() {
-    document.getElementById('notif-dropdown').classList.add('hidden');
-    document.getElementById('profile-dropdown').classList.toggle('hidden');
+    const notif = document.getElementById('notif-dropdown');
+    const profile = document.getElementById('profile-dropdown');
+    if (!notif.classList.contains('hidden')) animateDropdown(notif, false);
+    animateDropdown(profile, profile.classList.contains('hidden'));
 }
 function showProfileModal() {
     const m = document.getElementById('profile-modal'); m.classList.remove('hidden'); m.classList.add('flex');
@@ -468,7 +495,7 @@ function renderDashboard() {
         <!-- Stats -->
         <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
             ${stats.map(s => `
-                <div class="stat-card transition-all duration-300 cursor-default hover:-translate-y-1 hover:shadow-medium">
+                <div class="stat-card stat-card-animate transition-all duration-300 cursor-default hover:-translate-y-1 hover:shadow-medium">
                     <div class="flex items-start justify-between mb-4">
                         <div class="w-12 h-12 ${s.bg} rounded-2xl flex items-center justify-center text-xl" style="color: ${s.color}">${s.icon}</div>
                         <div class="flex items-center gap-1 text-xs font-semibold ${s.positive ? 'text-green-600 dark:text-green-400' : 'text-red-500 dark:text-red-400'}">
@@ -788,33 +815,32 @@ function handleSearchBlur() {
 
 // ─── Toast Notifications ────────────────────────────────────────────────────
 function showToast(message, type = 'success') {
-    // Check if toast container exists, if not create it
     let container = document.getElementById('toast-container');
     if (!container) {
         container = document.createElement('div');
         container.id = 'toast-container';
-        container.className = 'fixed bottom-6 right-6 z-50 flex flex-col gap-3';
+        container.className = 'fixed top-6 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-3';
         document.body.appendChild(container);
     }
 
     const toast = document.createElement('div');
-    const bgClass = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500';
+    const bgClass = type === 'success'
+        ? 'bg-green-500/90 border-green-400/30'
+        : type === 'error'
+            ? 'bg-red-500/90 border-red-400/30'
+            : 'bg-blue-500/90 border-blue-400/30';
     const icon = type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ️';
 
-    toast.className = `flex items-center gap-3 px-4 py-3 rounded-xl shadow-large text-white ${bgClass} transform translate-y-10 opacity-0 transition-all duration-300`;
-    toast.innerHTML = `<span class="font-bold">${icon}</span><span class="text-sm font-medium">${message}</span>`;
+    toast.className = `flex items-center gap-3 px-5 py-3 rounded-2xl shadow-large text-white backdrop-blur-md border ${bgClass} toast-enter`;
+    toast.innerHTML = `<span class="font-bold text-base">${icon}</span><span class="text-sm font-medium">${message}</span>`;
 
     container.appendChild(toast);
 
-    // Animate in
+    // Auto remove after 3s with exit animation
     setTimeout(() => {
-        toast.classList.remove('translate-y-10', 'opacity-0');
-    }, 10);
-
-    // Auto remove after 3 seconds
-    setTimeout(() => {
-        toast.classList.add('translate-y-10', 'opacity-0');
-        setTimeout(() => toast.remove(), 300);
+        toast.classList.remove('toast-enter');
+        toast.classList.add('toast-exit');
+        toast.addEventListener('animationend', () => toast.remove(), { once: true });
     }, 3000);
 }
 

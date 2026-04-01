@@ -7,14 +7,14 @@ router.get('/stats', (req, res) => {
     res.json({
         totalOrders: stats.totalOrders,
         predictedDemand: stats.predictedDemand,
-        preferences: stats.preferences,
+        activeDeliveries: stats.activeDeliveries,
         satisfactionScore: stats.satisfactionScore,
         avgOrderValue: stats.avgOrderValue,
         highDemandOrders: stats.highDemandOrders,
         changes: {
             totalOrders: '+12.5%',
             predictedDemand: '+23.4%',
-            preferences: 'Active Configs',
+            activeDeliveries: '+8.1%',
             satisfactionScore: '+3.2%',
         }
     })

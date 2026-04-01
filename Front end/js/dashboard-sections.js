@@ -351,7 +351,7 @@ function renderSettings() {
 
     const s = user.settings || {};
 
-    el.innerHTML = `<div class="space-y-6 animate-fade-in max-w-4xl">
+    el.innerHTML = `<div class="space-y-6 animate-fade-in max-w-6xl mx-auto w-full">
         <div class="flex items-center justify-between">
             <div><h2 class="text-2xl font-bold text-text-primary dark:text-dark-text">Settings</h2>
             <p class="text-sm text-text-secondary dark:text-dark-text-muted mt-1">Manage your analytics platform preferences</p></div>

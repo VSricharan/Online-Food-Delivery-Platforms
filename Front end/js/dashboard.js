@@ -103,7 +103,39 @@ function handleLogout() {
     }
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    window.location.href = 'index.html';
+
+    // ── Premium logout: whole-page dissolve ──
+    const root = document.getElementById('dashboard-root');
+
+    // 1. Create a white/dark veil overlay that fades in
+    const veil = document.createElement('div');
+    const isDark = document.documentElement.classList.contains('dark');
+    Object.assign(veil.style, {
+        position: 'fixed', inset: '0', zIndex: '9999',
+        background: isDark ? '#111827' : '#ffffff',
+        opacity: '0',
+        transition: 'opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+        pointerEvents: 'none',
+    });
+    document.body.appendChild(veil);
+
+    // 2. Animate the entire dashboard root as one unit
+    if (root) {
+        root.style.transition = 'transform 0.55s cubic-bezier(0.4, 0, 0.2, 1), filter 0.55s ease, opacity 0.55s ease';
+        root.style.transformOrigin = 'center center';
+    }
+
+    // Trigger on next frame for smooth start
+    requestAnimationFrame(() => {
+        veil.style.opacity = '1';
+        if (root) {
+            root.style.transform = 'scale(0.96) translateY(8px)';
+            root.style.filter = 'blur(6px)';
+            root.style.opacity = '0.3';
+        }
+    });
+
+    setTimeout(() => { window.location.href = 'index.html'; }, 600);
 }
 
 // ─── Sidebar ────────────────────────────────────────────────────────────────

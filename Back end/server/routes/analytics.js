@@ -23,7 +23,7 @@ router.get('/', (req, res) => {
     // City performance from powerbi_city_stats.csv
     const cityPerformance = cityStats.map(row => ({
         city: row.Cities,
-        orders: parseInt(row.Orders || 0),
+        orders: parseInt(row.Total_Orders || 0),
         percentage: parseFloat(row.High_Demand_Pct || 0)
     }))
 

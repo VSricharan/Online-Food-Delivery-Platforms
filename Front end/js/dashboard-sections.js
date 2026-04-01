@@ -125,7 +125,7 @@ async function loadPredictions() {
     el.innerHTML = '<div class="flex items-center justify-center h-96"><div class="w-10 h-10 border-4 border-purple-400 border-t-transparent rounded-full animate-spin"></div></div>';
     try {
         const data = await apiGetPredictions();
-        const MC = { 'Random Forest': '#34C759', 'CART (Tuned)': '#0A84FF', 'Decision Tree': '#FF9F0A', 'Naive Bayes': '#AF52DE' };
+        const MC = { 'XGBoost (Ensemble)': '#34C759', 'Random Forest (RF)': '#0A84FF', 'Decision Tree': '#FF9F0A', 'Linear Regression (LM)': '#AF52DE' };
         const BC = ['#0A84FF', '#AF52DE', '#34C759', '#FF9F0A', '#5AC8FA'];
         el.innerHTML = `<div class="space-y-6 animate-fade-in">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -141,10 +141,18 @@ async function loadPredictions() {
                 <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="border-b border-gray-100 dark:border-dark-border">
                     ${['Model', 'Accuracy', 'Precision', 'Recall', 'F1 Score', 'AUC-ROC'].map(h => `<th class="text-left py-2 px-3 text-xs font-semibold text-text-secondary dark:text-dark-text-muted">${h}</th>`).join('')}
                 </tr></thead><tbody>
-                    ${(data.models || []).map(m => `<tr class="border-b border-gray-50 dark:border-gray-800/50 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors ${m.name === data.bestModel?.name ? 'bg-green-50 dark:bg-green-900/10' : ''}">
-                        <td class="py-3 px-3"><div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full" style="background:${MC[m.name] || '#6E6E73'}"></div><span class="font-medium text-text-primary dark:text-dark-text text-xs">${m.name}</span>${m.name === data.bestModel?.name ? '<span class="text-xs bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-400 px-1.5 py-0.5 rounded-full font-semibold">Best</span>' : ''}</div></td>
+                    ${(data.models || []).map(m => {
+                        const isBest = m.name === data.bestModel?.name;
+                        const isSelected = m.name === data.selectedModel;
+                        const rowBg = isBest ? 'bg-green-50 dark:bg-green-900/10' : isSelected ? 'bg-blue-50 dark:bg-blue-900/10' : '';
+                        let badges = '';
+                        if (isBest) badges += '<span class="text-xs bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-400 px-1.5 py-0.5 rounded-full font-semibold">Best</span>';
+                        if (isSelected) badges += '<span class="text-xs bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-400 px-1.5 py-0.5 rounded-full font-semibold ml-1">Selected</span>';
+                        return `<tr class="border-b border-gray-50 dark:border-gray-800/50 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors ${rowBg}">
+                        <td class="py-3 px-3"><div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full" style="background:${MC[m.name] || '#6E6E73'}"></div><span class="font-medium text-text-primary dark:text-dark-text text-xs">${m.name}</span>${badges}</div></td>
                         ${[m.accuracy, m.precision, m.recall, m.f1Score, m.aucRoc].map(v => `<td class="py-3 px-3"><div class="flex items-center gap-2"><div class="w-16 h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden"><div class="h-full rounded-full" style="width:${(v || 0) * 100}%;background:${(v || 0) > .9 ? '#34C759' : (v || 0) > .8 ? '#0A84FF' : '#FF9F0A'}"></div></div><span class="text-xs font-semibold text-text-primary dark:text-dark-text">${((v || 0) * 100).toFixed(1)}%</span></div></td>`).join('')}
-                    </tr>`).join('')}
+                    </tr>`;
+                    }).join('')}
                 </tbody></table></div>
             </div>
             <div class="bg-white dark:bg-dark-card rounded-2xl p-6 shadow-soft border border-gray-100 dark:border-dark-border">
@@ -368,7 +376,7 @@ function renderSettings() {
 
         ${settingsCard('ML Model Configuration', 'Control prediction models, training schedules, and accuracy thresholds', '⚡', '#AF52DE', `
             <div class="grid md:grid-cols-2 gap-4">
-                <div><label class="block text-xs font-semibold text-text-secondary mb-2 uppercase tracking-wide">Prediction Model</label><select id="ml-model" class="input-field py-2.5 text-sm"><option ${s.mlModel === 'Gradient Boosting (XGBoost)' ? 'selected' : ''}>Gradient Boosting (XGBoost)</option><option ${s.mlModel === 'Random Forest' ? 'selected' : ''}>Random Forest</option><option ${s.mlModel === 'LSTM Neural Network' ? 'selected' : ''}>LSTM Neural Network</option><option ${s.mlModel === 'Facebook Prophet' ? 'selected' : ''}>Facebook Prophet</option><option ${s.mlModel === 'Ensemble (All Models)' ? 'selected' : ''}>Ensemble (All Models)</option></select></div>
+                <div><label class="block text-xs font-semibold text-text-secondary mb-2 uppercase tracking-wide">Prediction Model</label><select id="ml-model" class="input-field py-2.5 text-sm"><option ${s.mlModel === 'XGBoost (Ensemble)' ? 'selected' : ''}>XGBoost (Ensemble)</option><option ${s.mlModel === 'Random Forest (RF)' ? 'selected' : ''}>Random Forest (RF)</option><option ${s.mlModel === 'Decision Tree' ? 'selected' : ''}>Decision Tree</option><option ${s.mlModel === 'Linear Regression (LM)' ? 'selected' : ''}>Linear Regression (LM)</option></select></div>
                 <div><label class="block text-xs font-semibold text-text-secondary mb-2 uppercase tracking-wide">Forecast Horizon (Days)</label><select id="ml-horizon" class="input-field py-2.5 text-sm"><option ${s.mlHorizon === '1 Day' ? 'selected' : ''}>1 Day</option><option ${s.mlHorizon !== '1 Day' && s.mlHorizon !== '14 Days' && s.mlHorizon !== '30 Days' ? 'selected' : ''}>7 Days</option><option ${s.mlHorizon === '14 Days' ? 'selected' : ''}>14 Days</option><option ${s.mlHorizon === '30 Days' ? 'selected' : ''}>30 Days</option></select></div>
                 <div><label class="block text-xs font-semibold text-text-secondary mb-2 uppercase tracking-wide">Confidence Interval</label><select id="ml-confidence" class="input-field py-2.5 text-sm"><option ${s.mlConfidence === '90%' ? 'selected' : ''}>90%</option><option ${s.mlConfidence !== '90%' && s.mlConfidence !== '99%' ? 'selected' : ''}>95%</option><option ${s.mlConfidence === '99%' ? 'selected' : ''}>99%</option></select></div>
             </div>

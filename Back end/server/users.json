@@ -7,8 +7,8 @@
     "role": "Admin",
     "institution": "CloudPredict AI",
     "settings": {
-      "mlModel": "Ensemble (All Models)",
-      "mlHorizon": "14 Days",
+      "mlModel": "Linear Regression (LM)",
+      "mlHorizon": "7 Days",
       "mlConfidence": "95%",
       "cloudProvider": "Amazon Web Services (AWS)",
       "cloudRegion": "Asia Pacific — Mumbai (ap-south-1)",

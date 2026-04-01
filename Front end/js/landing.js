@@ -17,14 +17,14 @@ const steps = [
 ];
 
 const techs = [
-    { label: 'Python', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>', desc: 'Core ML & Backend', color: '#3B82F6' },
-    { label: 'Machine Learning', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>', desc: 'Scikit-learn, TensorFlow', color: '#F59E0B' },
-    { label: 'Cloud Computing', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>', desc: 'AWS / GCP / Azure', color: '#06B6D4' },
-    { label: 'Data Analytics', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>', desc: 'Pandas, NumPy', color: '#8B5CF6' },
-    { label: 'REST APIs', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>', desc: 'FastAPI, Flask', color: '#10B981' },
-    { label: 'Database', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>', desc: 'PostgreSQL, MongoDB', color: '#EC4899' },
-    { label: 'Real-time', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>', desc: 'Kafka, WebSockets', color: '#F97316' },
-    { label: 'Containers', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>', desc: 'Docker, Kubernetes', color: '#0EA5E9' },
+    { label: 'Python', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>', desc: 'Core ML & Backend', color: '#3B82F6', usedIn: 'Backend & ML Pipeline', usage: 'Python powers our entire machine learning pipeline — from data cleaning with Pandas to model training with Scikit-learn. It processes and transforms 2,000+ food delivery orders into actionable predictions displayed on the Dashboard.' },
+    { label: 'Machine Learning', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>', desc: 'Scikit-learn, TensorFlow', color: '#F59E0B', usedIn: 'Predictions Section', usage: 'XGBoost, Random Forest, Decision Tree, and Linear Regression models are trained and compared in the Predictions section. The ML Model Comparison table shows real accuracy, precision, recall, and F1 scores for each model.' },
+    { label: 'Cloud Computing', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>', desc: 'AWS / GCP / Azure', color: '#06B6D4', usedIn: 'Settings → Cloud Integration', usage: 'Cloud provider, region, and sync frequency are all configurable in the Settings page under Cloud Integration. The backend uses cloud-ready Node.js APIs with auto-scaling and encrypted backup toggles for production readiness.' },
+    { label: 'Data Analytics', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>', desc: 'Pandas, NumPy', color: '#8B5CF6', usedIn: 'Analytics Section', usage: 'The Analytics dashboard visualizes city-wise performance, platform distribution, customer satisfaction trends, and high-demand areas — all powered by Pandas/NumPy data processing from Power BI CSV exports.' },
+    { label: 'REST APIs', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>', desc: 'Node.js, Express', color: '#10B981', usedIn: 'Backend Server', usage: 'The Express.js REST API server hosts endpoints like /api/analytics, /api/predictions, /api/orders, and /api/auth — serving real-time data to every section of the frontend dashboard via secure JWT-authenticated requests.' },
+    { label: 'Database', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>', desc: 'CSV Data Warehouse', color: '#EC4899', usedIn: 'Data Layer', usage: 'Our in-memory data warehouse loads multiple Power BI CSV files on startup — including order data, regression results, classification outputs, city stats, and restaurant analytics — forming the backbone of all dashboard metrics.' },
+    { label: 'Real-time', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>', desc: 'Live Dashboard', color: '#F97316', usedIn: 'Dashboard & Orders', usage: 'The main Dashboard shows live KPI cards (total orders, high demand %, avg cost, satisfaction) that update in real-time. The Orders section provides a searchable, filterable table with pagination across 2,000+ records.' },
+    { label: 'Visualization', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>', desc: 'Chart.js, SVG Charts', color: '#0EA5E9', usedIn: 'Charts & Reports', usage: 'Interactive Chart.js visualizations render order trends, peak hours, city comparisons, and volume forecasts throughout the Analytics and Predictions sections. The Reports page generates downloadable PDF summaries with embedded charts.' },
 ];
 
 // ─── Render lists ───────────────────────────────────────────────────────────
@@ -77,14 +77,43 @@ function renderSteps() {
 
 function renderTechs() {
     const grid = document.getElementById('tech-grid');
+
+    // ── Create shared overlay (once) ──
+    const overlay = document.createElement('div');
+    overlay.className = 'tech-overlay';
+    overlay.innerHTML = `<div class="tech-modal-card" id="tech-modal"><div class="tech-modal-inner"><div class="tech-modal-front"></div><div class="tech-modal-back"></div></div></div>`;
+    document.body.appendChild(overlay);
+
+    const modal = overlay.querySelector('#tech-modal');
+    const backFace = overlay.querySelector('.tech-modal-back');
+
+    function closeModal() {
+        modal.classList.remove('flipped');
+        setTimeout(() => {
+            overlay.classList.remove('visible');
+        }, 350);
+    }
+
+    // Click ANYWHERE on the overlay (including the card) → close
+    overlay.addEventListener('click', () => {
+        if (overlay.classList.contains('visible')) closeModal();
+    });
+
+    // Escape key → close
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && overlay.classList.contains('visible')) closeModal();
+    });
+
+    // ── Render grid cards ──
     techs.forEach((tech, i) => {
-        const div = document.createElement('div');
-        div.className = 'group bg-bg-secondary dark:bg-dark-surface rounded-2xl p-6 flex flex-col items-center text-center gap-3 cursor-default border border-transparent transition-all duration-100 hover:bg-white dark:hover:bg-dark-card hover:border-gray-100 dark:hover:border-dark-border hover:-translate-y-1.5 stagger-enter';
-        div.style.transitionDelay = `${i * 0.06}s`;
-        div.onmouseenter = function () { this.style.boxShadow = `0 0 28px ${tech.color}45, 0 10px 36px rgba(0,0,0,0.09)`; };
-        div.onmouseleave = function () { this.style.boxShadow = ''; };
-        div.innerHTML = `
-            <div class="w-14 h-14 rounded-2xl flex items-center justify-center transition-transform duration-100 group-hover:scale-110" style="background-color:${tech.color}18; color:${tech.color}">
+        const card = document.createElement('div');
+        card.className = 'tech-grid-card group bg-bg-secondary dark:bg-dark-surface rounded-2xl p-6 flex flex-col items-center text-center gap-3 border border-transparent hover:border-gray-200 dark:hover:border-dark-border stagger-enter';
+        card.style.transitionDelay = `${i * 0.06}s`;
+        card.onmouseenter = function () { this.style.boxShadow = `0 0 28px ${tech.color}35, 0 10px 36px rgba(0,0,0,0.08)`; };
+        card.onmouseleave = function () { this.style.boxShadow = ''; };
+
+        card.innerHTML = `
+            <div class="w-14 h-14 rounded-2xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110" style="background-color:${tech.color}15; color:${tech.color}">
                 ${tech.icon}
             </div>
             <div>
@@ -92,7 +121,40 @@ function renderTechs() {
                 <div class="text-xs text-text-secondary dark:text-dark-text-muted mt-0.5">${tech.desc}</div>
             </div>
         `;
-        grid.appendChild(div);
+
+        card.addEventListener('click', () => {
+            // Populate the back face with usage info
+            backFace.style.background = `linear-gradient(145deg, ${tech.color}06 0%, ${tech.color}14 100%)`;
+            backFace.style.borderColor = `${tech.color}30`;
+            backFace.innerHTML = `
+                <div class="flex items-center gap-4 mb-5 w-full">
+                    <div class="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0" style="background-color:${tech.color}18; color:${tech.color}">
+                        ${tech.icon}
+                    </div>
+                    <div class="text-left">
+                        <div class="text-xl font-bold text-text-primary dark:text-dark-text">${tech.label}</div>
+                        <div class="text-sm text-text-secondary dark:text-dark-text-muted">${tech.desc}</div>
+                    </div>
+                </div>
+                <div class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-[11px] font-bold uppercase tracking-widest mb-5 self-start" style="background:${tech.color}15; color:${tech.color}; border: 1px solid ${tech.color}35;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                    Used in: ${tech.usedIn}
+                </div>
+                <p class="text-base text-text-secondary dark:text-dark-text-muted leading-relaxed text-left">${tech.usage}</p>
+                <div class="tech-modal-close-hint text-text-secondary dark:text-dark-text-muted">Click anywhere or press Esc to close</div>
+            `;
+
+            // Show overlay → then flip to reveal the back face
+            modal.classList.remove('flipped');
+            overlay.classList.add('visible');
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    modal.classList.add('flipped');
+                });
+            });
+        });
+
+        grid.appendChild(card);
     });
 }
 

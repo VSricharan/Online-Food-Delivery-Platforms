@@ -34,7 +34,7 @@ console.log(`   - ${predictions.length} forecast points`)
 
 // Derive dashboard stats
 const totalOrders = rawOrders.length
-const highDemand = rawOrders.filter(r => r.High_Demand_Area === 'Yes' || r.High_Demand_Area === 'TRUE').length
+const highDemand = rawOrders.filter(r => String(r.High_Demand_Area) === '1').length
 const avgCost = rawOrders.reduce((s, r) => s + parseFloat(r.Avg_Cost || 0), 0) / totalOrders
 const satisfactionMap = { 'Strongly Agree': 5, 'Agree': 4, 'Neutral': 3, 'Disagree': 2, 'Strongly Disagree': 1 }
 const satisfactionAvg = rawOrders.reduce((s, r) => s + (satisfactionMap[r.Ease_Convenient] || 3), 0) / totalOrders

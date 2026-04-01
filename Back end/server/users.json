@@ -58,5 +58,12 @@
     "email": "demo@cloudpredict.ai",
     "password": "$2a$10$XAW03.pR.EyP2qbatDzWZ.hIeu7ERxOIs4Dxiy9psuiwcO6w36aGC",
     "role": "Viewer"
+  },
+  {
+    "id": 1775049778636,
+    "name": "hello",
+    "email": "hello@cloudpredict.ai",
+    "password": "$2a$10$pxbwwZIjJw1cSDM.BV6s9OerTnTPa/cl/Z0m0iY74AMhfm/GDHByG",
+    "role": "Viewer"
   }
 ]

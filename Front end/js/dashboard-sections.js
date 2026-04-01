@@ -430,8 +430,8 @@ function renderSettings() {
             </div>
             <div class="flex flex-wrap gap-3 pt-2">
                 <button onclick="showToast('Checking for updates... All systems up to date.')" class="flex items-center gap-2 px-4 py-2 bg-bg-secondary dark:bg-dark-surface rounded-xl text-xs font-semibold text-text-secondary dark:text-dark-text-muted hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">🔄 Check for Updates</button>
-                <button onclick="showToast('API Key Management is currently locked for this demo account.', 'info')" class="flex items-center gap-2 px-4 py-2 bg-bg-secondary dark:bg-dark-surface rounded-xl text-xs font-semibold text-text-secondary dark:text-dark-text-muted hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">🔑 Manage API Keys</button>
-                <button onclick="showToast('Generating system logs report... Please wait.', 'success')" class="flex items-center gap-2 px-4 py-2 bg-bg-secondary dark:bg-dark-surface rounded-xl text-xs font-semibold text-text-secondary dark:text-dark-text-muted hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">📊 View Logs</button>
+                <button onclick="showApiKeysModal()" class="flex items-center gap-2 px-4 py-2 bg-bg-secondary dark:bg-dark-surface rounded-xl text-xs font-semibold text-text-secondary dark:text-dark-text-muted hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">🔑 Manage API Keys</button>
+                <button onclick="showLogsModal()" class="flex items-center gap-2 px-4 py-2 bg-bg-secondary dark:bg-dark-surface rounded-xl text-xs font-semibold text-text-secondary dark:text-dark-text-muted hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">📊 View Logs</button>
             </div>
         `)}
 
@@ -789,4 +789,167 @@ async function handleDeleteAccount() {
         pwInput.value = '';
         pwInput.focus();
     }
+}
+
+// ─── Settings Modals (API Keys & Logs) ──────────────────────────────────────
+
+const MAIN_ADMIN_ACCOUNTS = [
+    'sricharan@cloudpredict.ai',
+    'hamsa@cloudpredict.ai',
+    'jayakumar@cloudpredict.ai',
+    'sampath@cloudpredict.ai'
+];
+
+function checkAdminAccess(featureName) {
+    const userStr = localStorage.getItem('user');
+    if (!userStr) return false;
+    const user = JSON.parse(userStr);
+    
+    if (MAIN_ADMIN_ACCOUNTS.includes(user.email)) {
+        return true;
+    } else {
+        showToast(`Access Denied: ${featureName} is locked. You are on a demo or restricted account.`, 'error');
+        return false;
+    }
+}
+
+function createGlassModal(id, title, icon, contentHTML) {
+    if (document.getElementById(id)) return;
+    
+    const overlay = document.createElement('div');
+    overlay.id = id;
+    overlay.className = 'fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-md opacity-0 transition-opacity duration-300';
+    
+    // Smooth Apple-like entrance scale
+    overlay.innerHTML = `
+        <div class="bg-white/70 dark:bg-[#1E2024]/80 backdrop-blur-2xl border border-white/20 dark:border-white/10 shadow-2xl rounded-3xl w-full max-w-2xl overflow-hidden transform scale-95 transition-transform duration-300 relative shadow-[0_30px_60px_rgba(0,0,0,0.12)]">
+            <div class="px-8 py-6 border-b border-gray-200/50 dark:border-white/5 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="text-2xl">${icon}</div>
+                    <h2 class="text-lg font-bold text-text-primary dark:text-dark-text tracking-tight">${title}</h2>
+                </div>
+                <button id="${id}-close-btn" class="w-8 h-8 rounded-full bg-gray-200/50 dark:bg-white/10 flex items-center justify-center hover:bg-gray-300/50 dark:hover:bg-white/20 transition-colors text-text-secondary dark:text-white/60 hover:text-text-primary dark:hover:text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+            </div>
+            <div class="p-8">
+                ${contentHTML}
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    const closeHandler = () => {
+        overlay.classList.remove('opacity-100');
+        overlay.querySelector('div').classList.remove('scale-100');
+        setTimeout(() => overlay.remove(), 300);
+    };
+
+    overlay.querySelector(`#${id}-close-btn`).addEventListener('click', closeHandler);
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) closeHandler();
+    });
+    
+    // Document keydown for escape (needs to attach/detach properly, so we just check existence)
+    const escListener = (e) => {
+        if (e.key === 'Escape' && document.getElementById(id)) {
+            closeHandler();
+            document.removeEventListener('keydown', escListener);
+        }
+    };
+    document.addEventListener('keydown', escListener);
+
+    // Trigger animation
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            overlay.classList.add('opacity-100');
+            overlay.querySelector('div').classList.add('scale-100');
+        });
+    });
+}
+
+function showApiKeysModal() {
+    if (!checkAdminAccess('Manage API Keys')) return;
+
+    const keys = [
+        { name: 'AWS Cloud Services', role: 'Production Database Sync', key: 'ak_prod_8f92********************' },
+        { name: 'Mapbox API', role: 'Geospatial Analytics Routing', key: 'pk.eyJ1IjoicH**************************' },
+        { name: 'OpenAI API', role: 'Predictive Demand Insights Gen', key: 'sk-proj-Tf7*************************' },
+        { name: 'SendGrid Email', role: 'System Alert Notifications', key: 'SG.9aWf*****************************' }
+    ];
+
+    const content = `
+        <div class="space-y-4">
+            ${keys.map(k => `
+                <div class="flex items-center justify-between p-4 bg-white/50 dark:bg-black/20 rounded-2xl border border-gray-100 dark:border-white/5 hover:border-gray-200 dark:hover:border-white/10 transition-colors">
+                    <div class="flex-1 min-w-0 pr-4">
+                        <div class="text-sm font-bold text-text-primary dark:text-dark-text truncate">${k.name}</div>
+                        <div class="text-xs text-text-secondary dark:text-dark-text-muted mt-0.5 truncate">${k.role}</div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="px-3 py-1.5 bg-gray-100/80 dark:bg-white/5 rounded-lg text-xs font-mono text-text-primary dark:text-white/80 select-all border border-transparent dark:border-white/5">
+                            ${k.key}
+                        </div>
+                        <button onclick="showToast('API Key copied to clipboard', 'success')" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-primary/10 text-primary dark:bg-blue-500/20 dark:text-blue-400 hover:bg-primary/20 dark:hover:bg-blue-500/30 transition-colors">Copy</button>
+                    </div>
+                </div>
+            `).join('')}
+            
+            <div class="mt-8 flex items-start gap-3 p-4 bg-orange-50/80 dark:bg-orange-900/10 rounded-2xl border border-orange-100 dark:border-orange-900/30">
+                <div class="text-orange-500 dark:text-orange-400 mt-0.5">⚠️</div>
+                <div class="text-xs text-orange-800 dark:text-orange-300/80 leading-relaxed">
+                    <strong>Security Warning:</strong> These API keys provide full read/write access to CloudPredict's production infrastructure. Never share them or expose them in client-side code repositories.
+                </div>
+            </div>
+            
+            <div class="mt-6 flex justify-end">
+                 <button onclick="showToast('Generating new master token...', 'success')" class="px-5 py-2.5 bg-text-primary dark:bg-white text-white dark:text-black text-sm font-semibold rounded-xl hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors">
+                     Rotate Master Key
+                 </button>
+            </div>
+        </div>
+    `;
+
+    createGlassModal('modal-api-keys', 'Platform API Keys', '🔑', content);
+}
+
+function showLogsModal() {
+    if (!checkAdminAccess('View System Logs')) return;
+
+    // Simulate logs with timestamps
+    const now = new Date();
+    const t1 = new Date(now.getTime() - 2 * 60000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const t2 = new Date(now.getTime() - 15 * 60000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const t3 = new Date(now.getTime() - 43 * 60000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const t4 = new Date(now.getTime() - 65 * 60000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const t5 = new Date(now.getTime() - 120 * 60000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+    const content = `
+        <div class="bg-black/80 dark:bg-[#0E1015] rounded-2xl w-full h-[380px] border border-white/10 dark:border-white/5 overflow-hidden flex flex-col font-mono shadow-inner">
+            <div class="flex items-center gap-2 px-4 py-3 border-b border-white/10 bg-black/40">
+                <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                <div class="ml-2 text-[10px] text-white/40 uppercase tracking-widest">Live Terminal — sys-prod-01</div>
+            </div>
+            <div class="p-5 overflow-y-auto flex-1 space-y-3 text-xs leading-relaxed" id="live-log-container">
+                <div class="text-white/60"><span class="text-green-400 mr-2">[${t5}]</span> <span>[INFO] Docker containers initialized on prod-cluster-A.</span></div>
+                <div class="text-white/60"><span class="text-green-400 mr-2">[${t4}]</span> <span>[INFO] PostgreSQL database connected successfully (Pool: 20).</span></div>
+                <div class="text-white/60"><span class="text-yellow-400 mr-2">[${t3}]</span> <span>[WARN] High memory usage detected on Redis node 04 (82%). Auto-scaling Triggered.</span></div>
+                <div class="text-white/60"><span class="text-green-400 mr-2">[${t2}]</span> <span>[INFO] Cloud AWS snapshot backed up securely (Size: 4.2GB).</span></div>
+                <div class="text-white/60"><span class="text-blue-400 mr-2">[${t1}]</span> <span>[AUTH] User Sricharan (SuperAdmin) authenticated successfully.</span></div>
+                <div class="text-white/60"><span class="text-green-400 mr-2">[Live]</span> <span class="text-white">Waiting for new incoming log streams...</span><span class="animate-pulse opacity-50 ml-1">_</span></div>
+            </div>
+        </div>
+        
+        <div class="mt-6 flex justify-between items-center">
+            <div class="text-xs text-text-secondary dark:text-dark-text-muted">Showing latest 500 lines of system output.</div>
+            <button onclick="showToast('Logs downloaded successfully', 'success')" class="px-5 py-2 bg-bg-secondary dark:bg-white/10 text-text-primary dark:text-white text-sm font-semibold rounded-xl hover:bg-gray-200 dark:hover:bg-white/20 transition-colors">
+                📥 Export to CSV
+            </button>
+        </div>
+    `;
+
+    createGlassModal('modal-system-logs', 'Real-time System Logs', '📊', content);
 }

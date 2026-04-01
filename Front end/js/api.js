@@ -5,6 +5,15 @@ function getToken() {
     return localStorage.getItem('token');
 }
 
+// ─── System Logs Helper ──────────────────────────────────────────────────────
+function pushSystemLog(type, message, color = 'text-green-400') {
+    const logs = JSON.parse(localStorage.getItem('sysLogs') || '[]');
+    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    logs.unshift({ type, message, color, time });
+    if (logs.length > 500) logs.pop();
+    localStorage.setItem('sysLogs', JSON.stringify(logs));
+}
+
 function handleUnauthorized() {
     localStorage.removeItem('token');
     localStorage.removeItem('user');

@@ -295,6 +295,7 @@ async function handleSignIn() {
         const res = await apiLogin(email, password);
         localStorage.setItem('token', res.token);
         localStorage.setItem('user', JSON.stringify(res.user));
+        pushSystemLog('AUTH', `User ${res.user.name} (${res.user.role}) authenticated successfully.`, 'text-blue-400');
         window.location.href = 'dashboard.html';
     } catch (err) {
         const msg = err?.response?.data?.error || err?.response?.data?.message || 'Login failed. Please try again.';

@@ -917,13 +917,32 @@ function showApiKeysModal() {
 function showLogsModal() {
     if (!checkAdminAccess('View System Logs')) return;
 
-    // Simulate logs with timestamps
+    // Load actual logs
+    const storedLogs = JSON.parse(localStorage.getItem('sysLogs') || '[]');
+
+    // Setup base flavor logs if the system is completely new
+    let logsHtml = '';
     const now = new Date();
-    const t1 = new Date(now.getTime() - 2 * 60000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    const t2 = new Date(now.getTime() - 15 * 60000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    const t3 = new Date(now.getTime() - 43 * 60000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    const t4 = new Date(now.getTime() - 65 * 60000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    const t5 = new Date(now.getTime() - 120 * 60000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    
+    if (storedLogs.length === 0) {
+        const t5 = new Date(now.getTime() - 120 * 60000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        const t4 = new Date(now.getTime() - 65 * 60000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        const t3 = new Date(now.getTime() - 43 * 60000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        const t2 = new Date(now.getTime() - 15 * 60000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+        logsHtml += `
+            <div class="text-white/60"><span class="text-green-400 mr-2">[${t5}]</span> <span>[INFO] Docker containers initialized on prod-cluster-A.</span></div>
+            <div class="text-white/60"><span class="text-green-400 mr-2">[${t4}]</span> <span>[INFO] PostgreSQL database connected successfully (Pool: 20).</span></div>
+            <div class="text-white/60"><span class="text-yellow-400 mr-2">[${t3}]</span> <span>[WARN] High memory usage detected on Redis node 04 (82%). Auto-scaling Triggered.</span></div>
+            <div class="text-white/60"><span class="text-green-400 mr-2">[${t2}]</span> <span>[INFO] Cloud AWS snapshot backed up securely (Size: 4.2GB).</span></div>
+        `;
+    }
+
+    // Render real stored logs (chronological order - newest at bottom)
+    const reversedLogs = [...storedLogs].reverse();
+    reversedLogs.forEach(l => {
+        logsHtml += `<div class="text-white/60"><span class="text-green-400 mr-2">[${l.time}]</span> <span>[${l.type}] <span class="${l.color}">${l.message}</span></span></div>`;
+    });
 
     const content = `
         <div class="bg-black/80 dark:bg-[#0E1015] rounded-2xl w-full h-[380px] border border-white/10 dark:border-white/5 overflow-hidden flex flex-col font-mono shadow-inner">
@@ -933,23 +952,62 @@ function showLogsModal() {
                 <div class="w-3 h-3 rounded-full bg-green-500"></div>
                 <div class="ml-2 text-[10px] text-white/40 uppercase tracking-widest">Live Terminal — sys-prod-01</div>
             </div>
-            <div class="p-5 overflow-y-auto flex-1 space-y-3 text-xs leading-relaxed" id="live-log-container">
-                <div class="text-white/60"><span class="text-green-400 mr-2">[${t5}]</span> <span>[INFO] Docker containers initialized on prod-cluster-A.</span></div>
-                <div class="text-white/60"><span class="text-green-400 mr-2">[${t4}]</span> <span>[INFO] PostgreSQL database connected successfully (Pool: 20).</span></div>
-                <div class="text-white/60"><span class="text-yellow-400 mr-2">[${t3}]</span> <span>[WARN] High memory usage detected on Redis node 04 (82%). Auto-scaling Triggered.</span></div>
-                <div class="text-white/60"><span class="text-green-400 mr-2">[${t2}]</span> <span>[INFO] Cloud AWS snapshot backed up securely (Size: 4.2GB).</span></div>
-                <div class="text-white/60"><span class="text-blue-400 mr-2">[${t1}]</span> <span>[AUTH] User Sricharan (SuperAdmin) authenticated successfully.</span></div>
-                <div class="text-white/60"><span class="text-green-400 mr-2">[Live]</span> <span class="text-white">Waiting for new incoming log streams...</span><span class="animate-pulse opacity-50 ml-1">_</span></div>
+            <div class="p-5 overflow-y-auto flex-1 space-y-3 text-xs leading-relaxed flex flex-col" id="live-log-container">
+                <div class="flex-1 space-y-3">
+                    ${logsHtml}
+                </div>
+                <div class="text-white/60 mt-3 pt-3 border-t border-white/10"><span class="text-green-400 mr-2">[Live]</span> <span class="text-white">Waiting for new incoming log streams...</span><span class="animate-pulse opacity-50 ml-1">_</span></div>
             </div>
         </div>
         
         <div class="mt-6 flex justify-between items-center">
-            <div class="text-xs text-text-secondary dark:text-dark-text-muted">Showing latest 500 lines of system output.</div>
-            <button onclick="showToast('Logs downloaded successfully', 'success')" class="px-5 py-2 bg-bg-secondary dark:bg-white/10 text-text-primary dark:text-white text-sm font-semibold rounded-xl hover:bg-gray-200 dark:hover:bg-white/20 transition-colors">
+            <div class="text-xs text-text-secondary dark:text-dark-text-muted">Showing latest ${storedLogs.length > 0 ? storedLogs.length : 'system'} lines of output.</div>
+            <button onclick="exportLogsToCSV()" class="px-5 py-2 bg-bg-secondary dark:bg-white/10 text-text-primary dark:text-white text-sm font-semibold rounded-xl hover:bg-gray-200 dark:hover:bg-white/20 transition-colors">
                 📥 Export to CSV
             </button>
         </div>
     `;
 
     createGlassModal('modal-system-logs', 'Real-time System Logs', '📊', content);
+    
+    // Auto-scroll terminal to bottom
+    setTimeout(() => {
+        const container = document.getElementById('live-log-container');
+        if (container) container.scrollTop = container.scrollHeight;
+    }, 50);
+}
+
+function exportLogsToCSV() {
+    const storedLogs = JSON.parse(localStorage.getItem('sysLogs') || '[]');
+    
+    // Add default flavor logs if empty for demo purposes
+    let dataToExport = [];
+    if (storedLogs.length === 0) {
+        dataToExport = [
+            { time: 'T-120m', type: 'INFO', message: 'Docker containers initialized on prod-cluster-A.' },
+            { time: 'T-65m', type: 'INFO', message: 'PostgreSQL database connected successfully (Pool: 20).' },
+            { time: 'T-43m', type: 'WARN', message: 'High memory usage detected on Redis node 04 (82%). Auto-scaling Triggered.' },
+            { time: 'T-15m', type: 'INFO', message: 'Cloud AWS snapshot backed up securely (Size: 4.2GB).' }
+        ];
+    } else {
+        dataToExport = [...storedLogs].reverse();
+    }
+
+    let csvContent = "Timestamp,Log Level,Message\n";
+    dataToExport.forEach(l => {
+        // Escape quotes in message
+        const safeMsg = `"${l.message.replace(/"/g, '""')}"`;
+        csvContent += `${l.time},${l.type},${safeMsg}\n`;
+    });
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `cloudpredict_system_logs_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    showToast('Logs exported to CSV successfully', 'success');
 }

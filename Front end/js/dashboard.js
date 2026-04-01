@@ -94,6 +94,13 @@ function checkAuth() {
 }
 
 function handleLogout() {
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+        try {
+            const user = JSON.parse(userStr);
+            pushSystemLog('AUTH', `User ${user.name} logged out manually.`, 'text-blue-400');
+        } catch(e) {}
+    }
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     window.location.href = 'index.html';

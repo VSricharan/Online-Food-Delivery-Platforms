@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard — CloudPredict</title>
+    <meta name="description" content="CloudPredict Analytics Dashboard — Monitor demand predictions, orders, and delivery analytics." />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%230A84FF'/><text x='50%25' y='60%25' dominant-baseline='middle' text-anchor='middle' fill='white' font-size='18'>☁</text></svg>" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0A84FF',
+                        'primary-dark': '#0066CC',
+                        'bg-secondary': '#F5F5F7',
+                        'text-primary': '#1D1D1F',
+                        'text-secondary': '#6E6E73',
+                        'dark-bg': '#0B0B0F',
+                        'dark-surface': '#111827',
+                        'dark-card': '#1F2937',
+                        'dark-border': '#374151',
+                        'dark-text': '#F9FAFB',
+                        'dark-text-muted': '#9CA3AF',
+                    },
+                    fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+                    boxShadow: {
+                        'soft': '0 4px 24px rgba(0,0,0,0.06)',
+                        'medium': '0 8px 40px rgba(0,0,0,0.10)',
+                        'large': '0 20px 60px rgba(0,0,0,0.12)',
+                    },
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="css/styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    <script src="js/theme.js"></script>
+</head>
+<body class="dashboard-body bg-bg-secondary dark:bg-dark-bg transition-colors duration-300">
+    <div id="dashboard-root" class="flex h-screen overflow-hidden">
+        <!-- ────── SIDEBAR ────── -->
+        <aside id="sidebar" class="flex flex-col bg-white dark:bg-dark-surface border-r border-gray-100 dark:border-dark-border h-screen sticky top-0 overflow-hidden transition-all duration-300 w-64">
+            <!-- Logo -->
+            <div class="flex items-center gap-3 px-4 py-5 border-b border-gray-100 dark:border-dark-border">
+                <div class="w-8 h-8 bg-gradient-blue rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm" style="box-shadow:0 4px 12px rgba(10,132,255,0.3)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+                </div>
+                <span class="sidebar-label font-bold text-text-primary dark:text-dark-text text-sm">CloudPredict</span>
+            </div>
+            <!-- Nav -->
+            <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto scrollbar-hide" id="sidebar-nav">
+                <!-- Rendered by JS -->
+            </nav>
+            <!-- Bottom -->
+            <div class="px-3 py-4 border-t border-gray-100 dark:border-dark-border space-y-1">
+                <button onclick="toggleSidebar()" class="sidebar-link w-full text-text-secondary dark:text-dark-text-muted hover:bg-bg-secondary dark:hover:bg-gray-800 hover:text-text-primary dark:hover:text-dark-text">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+                    <span class="sidebar-label text-xs">Collapse</span>
+                </button>
+                <button onclick="handleLogout()" class="sidebar-link w-full text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+                    <span class="sidebar-label">Logout</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- ────── MAIN CONTENT ────── -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- ────── TOP BAR ────── -->
+            <header class="sticky top-0 z-40 bg-white/80 dark:bg-dark-bg/80 backdrop-blur-xl border-b border-gray-100 dark:border-dark-border px-6 py-4 flex items-center justify-between">
+                <div>
+                    <h1 id="topbar-title" class="text-lg font-bold text-text-primary dark:text-dark-text capitalize">Dashboard</h1>
+                    <p class="text-xs text-text-secondary dark:text-dark-text-muted">Welcome back, <span class="user-display-name">User</span></p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <!-- Search -->
+                    <div id="global-search-container" class="relative hidden md:flex items-center gap-2 bg-bg-secondary dark:bg-dark-surface rounded-xl px-3 py-2 w-56 lg:w-72">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-text-secondary dark:text-dark-text-muted flex-shrink-0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                        <input id="global-search-input" type="text" placeholder="Search 'Swiggy', 'Tier 1', 'Cafe'..." class="bg-transparent text-sm outline-none text-text-primary dark:text-dark-text placeholder-text-secondary dark:placeholder-gray-500 w-full" oninput="handleSearchInput(event)" onfocus="handleSearchFocus()" onblur="handleSearchBlur()" />
+                        
+                        <!-- Search Dropdown -->
+                        <div id="search-dropdown" class="absolute top-12 left-0 w-full md:w-80 bg-white dark:bg-dark-card border border-gray-100 dark:border-dark-border shadow-large rounded-2xl z-50 hidden opacity-0 transition-opacity duration-200 overflow-hidden">
+                            <div id="search-results-container" class="max-h-80 overflow-y-auto w-full p-2"></div>
+                        </div>
+                    </div>
+                    <!-- Theme Toggle -->
+                    <button onclick="toggleTheme()" class="theme-toggle-btn w-9 h-9 bg-bg-secondary dark:bg-dark-surface rounded-xl flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors">
+                        <svg class="icon-sun" style="display:none" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+                        <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+                    </button>
+                    <!-- Notifications -->
+                    <div class="relative">
+                        <button onclick="toggleNotifications()" class="relative w-9 h-9 bg-bg-secondary dark:bg-dark-surface rounded-xl flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-text-secondary dark:text-dark-text-muted"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+                            <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full"></span>
+                        </button>
+                        <div id="notif-dropdown" class="hidden absolute right-0 top-12 w-80 bg-white dark:bg-dark-surface rounded-2xl shadow-large border border-gray-100 dark:border-dark-border z-50 animate-fade-in overflow-hidden">
+                            <div class="px-4 py-3 border-b border-gray-100 dark:border-dark-border flex justify-between items-center">
+                                <span class="font-bold text-text-primary dark:text-dark-text text-sm">Notifications</span>
+                                <span class="text-xs text-primary font-semibold cursor-pointer">Mark all read</span>
+                            </div>
+                            <div id="notif-list"><!-- rendered by JS --></div>
+                        </div>
+                    </div>
+                    <!-- Profile -->
+                    <div class="relative">
+                        <button onclick="toggleProfileMenu()" class="flex items-center gap-2 pl-1 pr-3 py-1 rounded-xl bg-transparent hover:bg-bg-secondary dark:hover:bg-dark-surface transition-colors">
+                            <div class="w-8 h-8 bg-gradient-blue rounded-full flex items-center justify-center"><span class="user-display-initial text-white text-xs font-bold">U</span></div>
+                            <span class="user-display-name text-sm font-semibold text-text-primary dark:text-dark-text hidden md:block">User</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-text-secondary hidden md:block"><path d="m6 9 6 6 6-6"/></svg>
+                        </button>
+                        <div id="profile-dropdown" class="hidden absolute right-0 top-12 w-48 bg-white dark:bg-dark-card rounded-2xl shadow-large dark:shadow-none border border-gray-100 dark:border-dark-border z-50 animate-fade-in overflow-hidden">
+                            <button onclick="showProfileModal(); closeDropdowns()" class="w-full flex items-center gap-3 px-4 py-3 text-sm text-text-secondary dark:text-dark-text-muted hover:bg-bg-secondary dark:hover:bg-dark-surface hover:text-text-primary dark:hover:text-dark-text transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                Profile
+                            </button>
+                            <button onclick="setActiveSection('settings'); closeDropdowns()" class="w-full flex items-center gap-3 px-4 py-3 text-sm text-text-secondary dark:text-dark-text-muted hover:bg-bg-secondary dark:hover:bg-dark-surface hover:text-text-primary dark:hover:text-dark-text transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                                Settings
+                            </button>
+                            <div class="border-t border-gray-100 dark:border-dark-border">
+                                <button onclick="handleLogout()" class="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+                                    Logout
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- ────── MAIN CONTENT AREA ────── -->
+            <main class="flex-1 overflow-y-auto px-6 py-6 scrollbar-hide">
+                <div id="section-dashboard" class="section-content"></div>
+                <div id="section-analytics" class="section-content hidden"></div>
+                <div id="section-predictions" class="section-content hidden"></div>
+                <div id="section-orders" class="section-content hidden"></div>
+                <div id="section-reports" class="section-content hidden"></div>
+                <div id="section-settings" class="section-content hidden"></div>
+            </main>
+        </div>
+    </div>
+
+    <!-- ────── PROFILE MODAL ────── -->
+    <div id="profile-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40 backdrop-blur-sm animate-fade-in" onclick="hideProfileModal()">
+        <div class="bg-white dark:bg-dark-card rounded-3xl shadow-large dark:shadow-none border border-gray-100 dark:border-dark-border w-full max-w-sm mx-4 p-8" onclick="event.stopPropagation()">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold text-text-primary dark:text-dark-text">My Profile</h3>
+                <button onclick="hideProfileModal()" class="w-8 h-8 bg-bg-secondary dark:bg-dark-surface rounded-lg flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-text-secondary dark:text-dark-text-muted"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+            </div>
+            <div class="flex flex-col items-center gap-3 mb-8">
+                <div class="w-20 h-20 bg-gradient-blue rounded-full flex items-center justify-center"><span class="user-display-initial text-white text-3xl font-bold">U</span></div>
+                <div class="text-center">
+                    <div class="user-display-name text-xl font-bold text-text-primary dark:text-dark-text">User</div>
+                    <div class="user-display-role text-sm text-text-secondary dark:text-dark-text-muted mt-0.5">Role</div>
+                </div>
+            </div>
+            <div class="space-y-3">
+                <div class="flex justify-between items-center py-2 border-b border-gray-50 dark:border-dark-border"><span class="text-xs text-text-secondary dark:text-dark-text-muted">Email</span><span class="user-display-email text-xs font-semibold text-text-primary dark:text-dark-text">email@addess.com</span></div>
+                <div class="flex justify-between items-center py-2 border-b border-gray-50 dark:border-dark-border"><span class="text-xs text-text-secondary dark:text-dark-text-muted">Role</span><span class="user-display-role text-xs font-semibold text-text-primary dark:text-dark-text">Role</span></div>
+                <div class="flex justify-between items-center py-2 border-b border-gray-50 dark:border-dark-border"><span class="text-xs text-text-secondary dark:text-dark-text-muted">Institution</span><span class="text-xs font-semibold text-text-primary dark:text-dark-text">CloudPredict AI</span></div>
+                <div class="flex justify-between items-center py-2"><span class="text-xs text-text-secondary dark:text-dark-text-muted">Access Level</span><span class="text-xs font-semibold text-text-primary dark:text-dark-text">Standard User</span></div>
+            </div>
+            <button onclick="hideProfileModal(); setActiveSection('settings')" class="btn-primary w-full text-center mt-6 py-3">Edit in Settings</button>
+        </div>
+    </div>
+
+    <!-- ────── ORDER MODAL ────── -->
+    <div id="order-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40 backdrop-blur-sm animate-fade-in" onclick="hideOrderModal()">
+        <div class="bg-white dark:bg-dark-card rounded-3xl shadow-large dark:shadow-none border border-gray-100 dark:border-dark-border w-full max-w-sm mx-4 p-8" onclick="event.stopPropagation()">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h3 class="text-xl font-bold text-text-primary dark:text-dark-text" id="order-modal-title">Order Details</h3>
+                    <div class="text-xs text-text-secondary dark:text-dark-text-muted mt-1" id="order-modal-id">ORD-00000</div>
+                </div>
+                <button onclick="hideOrderModal()" class="w-8 h-8 bg-bg-secondary dark:bg-dark-surface rounded-lg flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-text-secondary dark:text-dark-text-muted"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+            </div>
+            
+            <div class="space-y-4">
+                <div class="p-4 rounded-xl bg-gray-50 dark:bg-dark-surface border border-gray-100 dark:border-dark-border">
+                    <div class="flex justify-between items-center mb-1"><span class="text-xs text-text-secondary dark:text-dark-text-muted">Restaurant</span><span class="text-sm font-semibold text-text-primary dark:text-dark-text" id="order-modal-restaurant">...</span></div>
+                    <div class="flex justify-between items-center mb-1"><span class="text-xs text-text-secondary dark:text-dark-text-muted">City</span><span class="text-sm font-semibold text-text-primary dark:text-dark-text" id="order-modal-city">...</span></div>
+                    <div class="flex justify-between items-center mb-1"><span class="text-xs text-text-secondary dark:text-dark-text-muted">Medium</span><span class="text-sm font-semibold text-text-primary dark:text-dark-text" id="order-modal-medium">...</span></div>
+                    <div class="flex justify-between items-center"><span class="text-xs text-text-secondary dark:text-dark-text-muted">Meal Type</span><span class="text-sm font-semibold text-text-primary dark:text-dark-text" id="order-modal-meal">...</span></div>
+                </div>
+                
+                <div class="flex gap-4">
+                    <div class="flex-1 p-4 rounded-xl bg-gray-50 dark:bg-dark-surface border border-gray-100 dark:border-dark-border text-center">
+                        <div class="text-xs text-text-secondary dark:text-dark-text-muted mb-1">Avg Cost</div>
+                        <div class="text-lg font-bold text-text-primary dark:text-dark-text" id="order-modal-cost">₹0</div>
+                    </div>
+                    <div class="flex-1 p-4 rounded-xl bg-gray-50 dark:bg-dark-surface border border-gray-100 dark:border-dark-border text-center">
+                        <div class="text-xs text-text-secondary dark:text-dark-text-muted mb-1">Delivery Time</div>
+                        <div class="text-lg font-bold text-blue-500" id="order-modal-time">0m</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PDF Generators -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
+    <script src="js/api.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/dashboard-sections.js"></script>
+</body>
+</html>

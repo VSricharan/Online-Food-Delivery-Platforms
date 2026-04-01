@@ -1,0 +1,620 @@
+# ==============================================================================
+# FILE: 05_rf_supabase.R
+# PROJECT: Online Food Delivery Business Intelligence
+# PURPOSE: Full Professional Analytics Pipeline
+#          Phase 1: Classification (Random Forest)
+#          Phase 2: Regression (Linear + RF for Revenue Prediction)
+#          Phase 3: Customer Segmentation (K-Means Clustering)
+#          Phase 4: Export for Power BI
+# AUTHOR: Sampath
+# DATE: 2026-02-25
+#
+# DATABASE: Supabase PostgreSQL (cloud) — STRICT CLOUD MODE
+# PACKAGES: DBI + RPostgres + randomForest (NO MySQL packages)
+# ==============================================================================
+
+
+# ==============================================================================
+# SECTION 1: INSTALL & LOAD REQUIRED PACKAGES
+# ==============================================================================
+
+options(repos = c(CRAN = "https://cran.rstudio.com/"))
+
+required_packages <- c("DBI", "RPostgres", "randomForest")
+
+for (pkg in required_packages) {
+    if (!require(pkg, character.only = TRUE, quietly = TRUE)) {
+        install.packages(pkg, dependencies = TRUE)
+        library(pkg, character.only = TRUE)
+    }
+}
+
+cat("=== Packages loaded: DBI, RPostgres, randomForest ===\n\n")
+
+
+# ==============================================================================
+# SECTION 2: CONNECT TO SUPABASE PostgreSQL (STRICT CLOUD MODE)
+# ==============================================================================
+
+# Supabase Session Pooler credentials
+db_host <- "aws-1-ap-northeast-1.pooler.supabase.com"
+db_port <- 6543
+db_user <- "postgres.aiocjupvvegmhsgcczgp"
+db_pass <- "Vzpj3YRT3u7Vbay3"
+db_name <- "postgres"
+
+cat("=== STRICT CLOUD MODE: Connecting to Supabase PostgreSQL ===\n\n")
+cat("  Host:    ", db_host, "\n")
+cat("  Port:    ", db_port, "\n")
+cat("  User:    ", db_user, "\n")
+cat("  Database:", db_name, "\n\n")
+
+# Connect with SSL — NO fallback, NO local file loading
+con <- dbConnect(
+    RPostgres::Postgres(),
+    host     = db_host,
+    port     = db_port,
+    user     = db_user,
+    password = db_pass,
+    dbname   = db_name,
+    sslmode  = "require"
+)
+
+cat(">> CONNECTED TO SUPABASE SUCCESSFULLY <<\n\n")
+
+# Load food_orders from public schema
+df <- dbGetQuery(con, "SELECT * FROM public.food_orders")
+cat(">> ROWS FETCHED:", nrow(df), "<<\n\n")
+
+
+# ==============================================================================
+# SECTION 3: DATA OVERVIEW
+# ==============================================================================
+
+cat("================================================================\n")
+cat("  DATA OVERVIEW\n")
+cat("================================================================\n\n")
+
+cat("Total Rows:", nrow(df), "\n")
+cat("Total Columns:", ncol(df), "\n\n")
+
+cat("Column Names:\n")
+print(names(df))
+cat("\n")
+
+cat("Missing Values Per Column:\n")
+missing_counts <- colSums(is.na(df))
+missing_df <- data.frame(
+    Column  = names(missing_counts),
+    Missing = as.integer(missing_counts)
+)
+print(missing_df, row.names = FALSE)
+cat("\nTotal missing values:", sum(missing_counts), "\n\n")
+
+
+# ==============================================================================
+# SECTION 4: PREPARE TWO DATASET COPIES
+# ==============================================================================
+
+# Convert character columns to factors globally
+char_cols <- names(df)[sapply(df, is.character)]
+for (col in char_cols) {
+    df[[col]] <- as.factor(df[[col]])
+}
+
+# Remove ID columns globally
+id_cols <- c(
+    "order_id", "customer_id", "restaurant_id",
+    "Order_ID", "Customer_ID", "Restaurant_ID"
+)
+for (col in id_cols) {
+    if (col %in% names(df)) {
+        df[[col]] <- NULL
+    }
+}
+
+# Fill NAs globally
+for (col in names(df)) {
+    if (sum(is.na(df[[col]])) > 0) {
+        if (is.numeric(df[[col]])) {
+            df[[col]][is.na(df[[col]])] <- median(df[[col]], na.rm = TRUE)
+        } else if (is.factor(df[[col]])) {
+            df[[col]][is.na(df[[col]])] <- names(sort(table(df[[col]]),
+                decreasing = TRUE
+            ))[1]
+        }
+    }
+}
+
+# Save full copy BEFORE removing leakage columns
+df_full <- df
+
+# Create classification copy with leakage columns removed
+df_class <- df
+
+leakage_cols <- c(
+    "High_Demand_Location", "Cost_Category", "Avg_Cost",
+    "City_Tier", "Days_Since_Prior", "Order_Frequency", "Cities"
+)
+
+cat("Leakage features removed for classification:\n")
+for (col in leakage_cols) {
+    if (col %in% names(df_class)) {
+        df_class[[col]] <- NULL
+        cat("  REMOVED:", col, "\n")
+    }
+}
+cat("\n")
+
+cat("df_full:  ", nrow(df_full), "rows x", ncol(df_full), "columns (all features)\n")
+cat("df_class: ", nrow(df_class), "rows x", ncol(df_class), "columns (leakage-safe)\n\n")
+
+
+# ======================================================================
+#   PHASE 1: CLASSIFICATION - Random Forest (High_Demand_Area)
+# ======================================================================
+
+cat("================================================================\n")
+cat("  PHASE 1: CLASSIFICATION (Random Forest)\n")
+cat("================================================================\n\n")
+
+# --- Target variable ---
+df_class$High_Demand_Area <- as.factor(df_class$High_Demand_Area)
+cat("Target: 'High_Demand_Area' (factor)\n")
+cat("Levels:", levels(df_class$High_Demand_Area), "\n")
+cat("Distribution:\n")
+print(table(df_class$High_Demand_Area))
+cat("\n")
+
+# --- 70/30 Split ---
+set.seed(42)
+cls_idx <- sample(seq_len(nrow(df_class)), size = 0.7 * nrow(df_class))
+cls_train <- df_class[cls_idx, ]
+cls_test <- df_class[-cls_idx, ]
+
+# Align factor levels
+for (col in names(cls_train)) {
+    if (is.factor(cls_train[[col]])) {
+        all_lvls <- union(levels(cls_train[[col]]), levels(cls_test[[col]]))
+        cls_train[[col]] <- factor(cls_train[[col]], levels = all_lvls)
+        cls_test[[col]] <- factor(cls_test[[col]], levels = all_lvls)
+    }
+}
+
+cat("Train:", nrow(cls_train), "| Test:", nrow(cls_test), "(70/30)\n\n")
+
+# --- Train Random Forest ---
+cat("Training Random Forest (ntree=100, mtry=2)...\n")
+
+rf_cls <- randomForest(
+    High_Demand_Area ~ .,
+    data       = cls_train,
+    ntree      = 100,
+    mtry       = 2,
+    importance = TRUE
+)
+
+cat("Done.\n\n")
+
+# --- OOB Error ---
+oob_error <- rf_cls$err.rate[nrow(rf_cls$err.rate), "OOB"]
+cat("OOB Error Rate:", round(oob_error * 100, 2), "%\n\n")
+
+# --- Predictions & Confusion Matrix ---
+cls_preds <- predict(rf_cls, newdata = cls_test)
+cm <- table(Predicted = cls_preds, Actual = cls_test$High_Demand_Area)
+
+cat("--- Confusion Matrix ---\n")
+print(cm)
+cat("\n")
+
+# --- Metrics ---
+cls_accuracy <- sum(diag(cm)) / sum(cm)
+
+lvls <- rownames(cm)
+pos <- ifelse("1" %in% lvls, "1", lvls[2])
+TP <- cm[pos, pos]
+FP <- sum(cm[pos, ]) - TP
+FN <- sum(cm[, pos]) - TP
+
+cls_precision <- TP / (TP + FP)
+cls_recall <- TP / (TP + FN)
+cls_f1 <- 2 * (cls_precision * cls_recall) / (cls_precision + cls_recall)
+
+cat("Accuracy: ", round(cls_accuracy * 100, 2), "%\n")
+cat("Precision:", round(cls_precision * 100, 2), "%\n")
+cat("Recall:   ", round(cls_recall * 100, 2), "%\n")
+cat("F1 Score: ", round(cls_f1 * 100, 2), "%\n")
+cat("OOB Error:", round(oob_error * 100, 2), "%\n\n")
+
+# --- Feature Importance ---
+cls_imp <- as.data.frame(importance(rf_cls))
+cls_imp$Feature <- rownames(cls_imp)
+cls_imp <- cls_imp[order(-cls_imp$MeanDecreaseGini), ]
+
+cat("Feature Importance (Classification):\n\n")
+cat(sprintf(
+    "%-5s %-25s %15s %15s\n", "Rank", "Feature",
+    "MeanDecAccuracy", "MeanDecGini"
+))
+cat(paste(rep("-", 63), collapse = ""), "\n")
+for (i in seq_len(nrow(cls_imp))) {
+    cat(sprintf(
+        "%-5d %-25s %15.4f %15.4f\n", i, cls_imp$Feature[i],
+        cls_imp$MeanDecreaseAccuracy[i], cls_imp$MeanDecreaseGini[i]
+    ))
+}
+
+# --- Store classification results ---
+classification_results <- data.frame(
+    Actual    = cls_test$High_Demand_Area,
+    Predicted = cls_preds
+)
+
+cat("\n")
+cat(">> CLASSIFICATION MODEL TRAINED SUCCESSFULLY <<\n\n")
+
+
+# ======================================================================
+#   PHASE 2: REGRESSION - Revenue Prediction (Avg_Cost)
+# ======================================================================
+
+cat("================================================================\n")
+cat("  PHASE 2: REGRESSION (Revenue Prediction)\n")
+cat("================================================================\n\n")
+
+# --- Prepare regression data ---
+reg_features <- c("City_Tier", "Order_Hour", "Restaurant_Type", "Family_Size")
+reg_target <- "Avg_Cost"
+
+# Verify columns exist
+missing_cols <- setdiff(c(reg_features, reg_target), names(df_full))
+if (length(missing_cols) > 0) {
+    cat("WARNING: Missing columns for regression:", paste(missing_cols, collapse = ", "), "\n")
+    cat("Skipping regression phase.\n\n")
+} else {
+    df_reg <- df_full[, c(reg_target, reg_features)]
+
+    # Ensure correct numeric types (Supabase may return different types)
+    df_reg$Avg_Cost <- as.numeric(df_reg$Avg_Cost)
+    df_reg$City_Tier <- as.numeric(df_reg$City_Tier)
+    df_reg$Order_Hour <- as.numeric(df_reg$Order_Hour)
+    df_reg$Family_Size <- as.numeric(df_reg$Family_Size)
+    if (is.character(df_reg$Restaurant_Type)) {
+        df_reg$Restaurant_Type <- as.factor(df_reg$Restaurant_Type)
+    }
+
+    # Remove rows with NA or Inf
+    df_reg <- df_reg[complete.cases(df_reg), ]
+    df_reg <- df_reg[is.finite(df_reg$Avg_Cost), ]
+    cat("Regression dataset:", nrow(df_reg), "rows (clean)\n")
+
+    # --- 70/30 Split ---
+    set.seed(42)
+    reg_idx <- sample(seq_len(nrow(df_reg)), size = 0.7 * nrow(df_reg))
+    reg_train <- df_reg[reg_idx, ]
+    reg_test <- df_reg[-reg_idx, ]
+
+    # Align factor levels between train/test
+    if (is.factor(reg_train$Restaurant_Type)) {
+        all_rt <- union(
+            levels(reg_train$Restaurant_Type),
+            levels(reg_test$Restaurant_Type)
+        )
+        reg_train$Restaurant_Type <- factor(reg_train$Restaurant_Type, levels = all_rt)
+        reg_test$Restaurant_Type <- factor(reg_test$Restaurant_Type, levels = all_rt)
+    }
+
+    cat("Train:", nrow(reg_train), "| Test:", nrow(reg_test), "(70/30)\n\n")
+
+    # ---- LINEAR REGRESSION ----
+    cat("--- Linear Regression ---\n\n")
+
+    lm_model <- lm(Avg_Cost ~ City_Tier + Order_Hour + Restaurant_Type + Family_Size,
+        data = reg_train
+    )
+
+    lm_summary <- summary(lm_model)
+
+    lm_r2 <- lm_summary$r.squared
+    lm_adj_r2 <- lm_summary$adj.r.squared
+
+    lm_preds <- predict(lm_model, newdata = reg_test)
+    lm_rmse <- sqrt(mean((reg_test$Avg_Cost - lm_preds)^2, na.rm = TRUE))
+
+    cat("R-squared:         ", round(lm_r2, 4), "\n")
+    cat("Adjusted R-squared:", round(lm_adj_r2, 4), "\n")
+    cat("RMSE:              ", round(lm_rmse, 2), "\n\n")
+
+    # Print coefficient table
+    cat("Coefficients:\n")
+    print(round(coef(lm_summary), 4))
+    cat("\n")
+
+    # ---- RANDOM FOREST REGRESSION ----
+    cat("--- Random Forest Regression ---\n\n")
+
+    rf_reg <- randomForest(
+        Avg_Cost ~ City_Tier + Order_Hour + Restaurant_Type + Family_Size,
+        data = reg_train,
+        ntree = 100,
+        importance = TRUE
+    )
+
+    rf_reg_preds <- predict(rf_reg, newdata = reg_test)
+    rf_reg_rmse <- sqrt(mean((reg_test$Avg_Cost - rf_reg_preds)^2, na.rm = TRUE))
+
+    # Compute R-squared for RF
+    ss_res <- sum((reg_test$Avg_Cost - rf_reg_preds)^2, na.rm = TRUE)
+    ss_tot <- sum((reg_test$Avg_Cost - mean(reg_test$Avg_Cost, na.rm = TRUE))^2, na.rm = TRUE)
+    rf_r2 <- 1 - (ss_res / ss_tot)
+
+    cat("RF R-squared:", round(rf_r2, 4), "\n")
+    cat("RF RMSE:     ", round(rf_reg_rmse, 2), "\n\n")
+
+    # RF Feature Importance (regression)
+    reg_imp <- as.data.frame(importance(rf_reg))
+    reg_imp$Feature <- rownames(reg_imp)
+    reg_imp <- reg_imp[order(-reg_imp$`%IncMSE`), ]
+
+    cat("Feature Importance (Regression):\n\n")
+    cat(sprintf(
+        "%-5s %-25s %12s %15s\n", "Rank", "Feature",
+        "%IncMSE", "IncNodePurity"
+    ))
+    cat(paste(rep("-", 60), collapse = ""), "\n")
+    for (i in seq_len(nrow(reg_imp))) {
+        cat(sprintf(
+            "%-5d %-25s %12.4f %15.4f\n", i, reg_imp$Feature[i],
+            reg_imp$`%IncMSE`[i], reg_imp$IncNodePurity[i]
+        ))
+    }
+    cat("\n")
+
+    # --- Store regression results ---
+    regression_results <- data.frame(
+        Actual_Avg_Cost = reg_test$Avg_Cost,
+        LM_Predicted    = round(lm_preds, 2),
+        RF_Predicted    = round(rf_reg_preds, 2)
+    )
+
+    cat(">> REGRESSION MODEL TRAINED SUCCESSFULLY <<\n\n")
+}
+
+
+# ======================================================================
+#   PHASE 3: CUSTOMER SEGMENTATION (K-Means Clustering)
+# ======================================================================
+
+cat("================================================================\n")
+cat("  PHASE 3: CUSTOMER SEGMENTATION (K-Means)\n")
+cat("================================================================\n\n")
+
+# --- Select numeric behavior features ---
+seg_features <- c("Avg_Cost", "Days_Since_Prior", "Order_Hour", "Family_Size")
+
+missing_seg <- setdiff(seg_features, names(df_full))
+if (length(missing_seg) > 0) {
+    cat("WARNING: Missing columns for segmentation:", paste(missing_seg, collapse = ", "), "\n")
+    cat("Skipping segmentation phase.\n\n")
+} else {
+    df_seg <- df_full[, seg_features]
+
+    # Ensure all numeric
+    for (col in names(df_seg)) {
+        df_seg[[col]] <- as.numeric(df_seg[[col]])
+    }
+
+    # Remove NAs before scaling
+    df_seg <- df_seg[complete.cases(df_seg), ]
+
+    # --- Scale features ---
+    df_seg_scaled <- scale(df_seg)
+    cat("Features scaled:", paste(seg_features, collapse = ", "), "\n\n")
+
+    # --- Elbow Method ---
+    cat("--- Elbow Method (WSS for k=1 to 10) ---\n\n")
+
+    max_k <- 10
+    wss <- numeric(max_k)
+    for (k in 1:max_k) {
+        set.seed(42)
+        km <- kmeans(df_seg_scaled, centers = k, nstart = 25, iter.max = 100)
+        wss[k] <- km$tot.withinss
+    }
+
+    cat(sprintf("%-5s %15s\n", "k", "Total WSS"))
+    cat(paste(rep("-", 22), collapse = ""), "\n")
+    for (k in 1:max_k) {
+        cat(sprintf("%-5d %15.2f\n", k, wss[k]))
+    }
+    cat("\n")
+
+    # --- Determine optimal k ---
+    wss_diff <- abs(diff(wss))
+    wss_diff2 <- abs(diff(wss_diff))
+    optimal_k <- which.max(wss_diff2) + 1
+    if (optimal_k < 2) optimal_k <- 3
+    if (optimal_k > 6) optimal_k <- 3
+
+    cat("Optimal k (elbow heuristic):", optimal_k, "\n")
+    cat("Using k = 3 for business interpretability.\n\n")
+    optimal_k <- 3
+
+    # --- K-Means ---
+    set.seed(42)
+    km_final <- kmeans(df_seg_scaled,
+        centers = optimal_k, nstart = 25,
+        iter.max = 100
+    )
+
+    df_seg$Cluster <- as.factor(km_final$cluster)
+
+    cat("Clusters assigned to", nrow(df_seg), "observations.\n\n")
+
+    # --- Cluster Summary ---
+    cat("--- Cluster Summary ---\n\n")
+
+    cat(sprintf(
+        "%-10s %10s %12s %15s %12s\n",
+        "Cluster", "Size", "Avg_Spend", "Avg_DaysSince", "Avg_FamSize"
+    ))
+    cat(paste(rep("-", 62), collapse = ""), "\n")
+
+    seg_summary_list <- list()
+    for (cl in sort(unique(km_final$cluster))) {
+        cl_data <- df_seg[df_seg$Cluster == cl, ]
+        avg_spend <- round(mean(cl_data$Avg_Cost), 2)
+        avg_freq <- round(mean(cl_data$Days_Since_Prior), 2)
+        avg_fam <- round(mean(cl_data$Family_Size), 2)
+        cl_size <- nrow(cl_data)
+
+        cat(sprintf(
+            "%-10d %10d %12.2f %15.2f %12.2f\n",
+            cl, cl_size, avg_spend, avg_freq, avg_fam
+        ))
+
+        seg_summary_list[[cl]] <- data.frame(
+            Cluster         = cl,
+            Size            = cl_size,
+            Avg_Spend       = avg_spend,
+            Avg_Days_Since  = avg_freq,
+            Avg_Family_Size = avg_fam
+        )
+    }
+    cat("\n")
+
+    segmentation_summary <- do.call(rbind, seg_summary_list)
+
+    # Business interpretation labels
+    cat("Segment Interpretation:\n")
+    for (cl in sort(unique(km_final$cluster))) {
+        cl_data <- df_seg[df_seg$Cluster == cl, ]
+        avg_s <- mean(cl_data$Avg_Cost)
+        avg_d <- mean(cl_data$Days_Since_Prior)
+
+        label <- if (avg_s > quantile(df_seg$Avg_Cost, 0.66) & avg_d < median(df_seg$Days_Since_Prior)) {
+            "High-Value Frequent"
+        } else if (avg_s < quantile(df_seg$Avg_Cost, 0.33)) {
+            "Budget-Conscious"
+        } else {
+            "Moderate Spender"
+        }
+        cat(
+            "  Cluster", cl, "->", label,
+            "(Avg Spend:", round(avg_s, 0), "| Days Between Orders:", round(avg_d, 0), ")\n"
+        )
+    }
+
+    cat("\n>> CUSTOMER SEGMENTATION COMPLETED <<\n\n")
+}
+
+
+# ======================================================================
+#   PHASE 4: EXPORT FOR POWER BI
+# ======================================================================
+
+cat("================================================================\n")
+cat("  PHASE 4: EXPORT FOR POWER BI\n")
+cat("================================================================\n\n")
+
+if (exists("classification_results")) {
+    write.csv(classification_results, "classification_results.csv", row.names = FALSE)
+    cat("EXPORTED: classification_results.csv\n")
+}
+
+if (exists("regression_results")) {
+    write.csv(regression_results, "regression_results.csv", row.names = FALSE)
+    cat("EXPORTED: regression_results.csv\n")
+}
+
+if (exists("segmentation_summary")) {
+    write.csv(segmentation_summary, "segmentation_summary.csv", row.names = FALSE)
+    cat("EXPORTED: segmentation_summary.csv\n")
+}
+
+if (exists("cls_imp")) {
+    fi_export <- data.frame(
+        Rank = seq_len(nrow(cls_imp)),
+        Feature = cls_imp$Feature,
+        MeanDecreaseAccuracy = round(cls_imp$MeanDecreaseAccuracy, 4),
+        MeanDecreaseGini = round(cls_imp$MeanDecreaseGini, 4)
+    )
+    write.csv(fi_export, "feature_importance.csv", row.names = FALSE)
+    cat("EXPORTED: feature_importance.csv\n")
+}
+
+cat("\n")
+
+
+# ======================================================================
+#   FINAL SUMMARY
+# ======================================================================
+
+cat("================================================================\n")
+cat("  FINAL ANALYTICS SUMMARY\n")
+cat("================================================================\n\n")
+
+cat("CLASSIFICATION:\n")
+cat("  Accuracy: ", round(cls_accuracy * 100, 2), "%\n")
+cat("  F1 Score: ", round(cls_f1 * 100, 2), "%\n")
+cat("  OOB Error:", round(oob_error * 100, 2), "%\n\n")
+
+if (exists("lm_r2")) {
+    cat("REGRESSION (Avg_Cost Prediction):\n")
+    cat("  Linear R-squared:", round(lm_r2, 4), "\n")
+    cat("  Linear RMSE:     ", round(lm_rmse, 2), "\n")
+    cat("  RF R-squared:    ", round(rf_r2, 4), "\n")
+    cat("  RF RMSE:         ", round(rf_reg_rmse, 2), "\n\n")
+}
+
+if (exists("segmentation_summary")) {
+    cat("CUSTOMER SEGMENTATION:\n")
+    cat("  Number of Segments:", optimal_k, "\n")
+    for (i in seq_len(nrow(segmentation_summary))) {
+        cat(
+            "  Segment", segmentation_summary$Cluster[i],
+            "| Size:", segmentation_summary$Size[i],
+            "| Avg Spend:", segmentation_summary$Avg_Spend[i], "\n"
+        )
+    }
+    cat("\n")
+}
+
+if (exists("reg_imp")) {
+    cat("TOP REVENUE DRIVERS:\n")
+    top_drivers <- min(3, nrow(reg_imp))
+    for (i in 1:top_drivers) {
+        cat("  ", i, ".", reg_imp$Feature[i], "\n")
+    }
+    cat("\n")
+}
+
+cat("BUSINESS INTERPRETATION:\n")
+cat(
+    "  - The Random Forest classifier identifies high-demand areas with",
+    round(cls_accuracy * 100, 1), "% accuracy.\n"
+)
+if (exists("lm_r2")) {
+    cat(
+        "  - Revenue (Avg_Cost) is best predicted by the RF model",
+        "(R2 =", round(rf_r2, 4), ").\n"
+    )
+}
+if (exists("optimal_k")) {
+    cat(
+        "  - Customers naturally segment into", optimal_k,
+        "distinct behavior groups.\n"
+    )
+}
+cat("  - All results exported to CSV for Power BI dashboarding.\n\n")
+
+# --- Disconnect ---
+if (!is.null(con) && dbIsValid(con)) {
+    dbDisconnect(con)
+    cat("Supabase connection closed.\n\n")
+}
+
+cat("================================================================\n")
+cat("  FULL ANALYTICS PIPELINE COMPLETED SUCCESSFULLY\n")
+cat("================================================================\n")

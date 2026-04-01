@@ -1,0 +1,17 @@
+"Rank","Feature","MeanDecreaseAccuracy","MeanDecreaseGini"
+1,"Restaurant_Type",19.7661,81.7646
+2,"Age",10.9384,49.9112
+3,"Order_Hour",8.4253,45.8415
+4,"Family_Size",5.6185,35.4469
+5,"Meal",6.666,28.3086
+6,"Ease_Convenient",8.3724,24.0843
+7,"Time_Period",8.5536,23.8463
+8,"Monthly_Income",8.8546,23.8349
+9,"Education",10.1186,21.5357
+10,"Medium",-0.5937,19.5582
+11,"Occupation",7.8576,17.9497
+12,"Order_Time",8.4387,16.479
+13,"Income_Level",8.3882,16.2521
+14,"Preference",6.4727,14.0661
+15,"Marital_Status",6.8175,12.9481
+16,"Gender",7.7688,12.6395

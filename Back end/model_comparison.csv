@@ -1,0 +1,5 @@
+"Model","Accuracy","Precision","Recall","F1_Score","AUC_ROC"
+"Decision Tree",0.855,0.8024,0.8458,0.8235,0.8984
+"CART (Tuned)",0.8867,0.8308,0.9,0.864,0.9364
+"Random Forest",0.8683,0.8157,0.8667,0.8404,0.9437
+"Rule-Based (C5.0)",0.9,0.8629,0.8917,0.877,0.9615

@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1,
+    "name": "Sricharan",
+    "email": "sricharan@cloudpredict.ai",
+    "password": "$2a$10$UUTlQDG51w0SrDATEkQcP.DC9yh8fKK/POLn4PmDiFyif/EPS.ySG",
+    "role": "Admin",
+    "institution": "CloudPredict AI",
+    "settings": {
+      "mlModel": "Ensemble (All Models)",
+      "mlHorizon": "14 Days",
+      "mlConfidence": "95%",
+      "cloudProvider": "Amazon Web Services (AWS)",
+      "cloudRegion": "Asia Pacific — Mumbai (ap-south-1)",
+      "cloudSync": "Every 5 minutes",
+      "dataRetention": "90 Days",
+      "mlAuto": true,
+      "mlFeat": true,
+      "mlAnomaly": true,
+      "cloudScale": true,
+      "cloudBackup": true,
+      "cloudEncrypt": true,
+      "notifDemand": true,
+      "notifRetrain": true,
+      "notifDelivery": true,
+      "notifSystem": true,
+      "notifEmail": false,
+      "notifSms": false,
+      "dataAnon": false,
+      "dataShare": false,
+      "dataGdpr": false
+    }
+  },
+  {
+    "id": 2,
+    "name": "Hamsa",
+    "email": "hamsa@cloudpredict.ai",
+    "password": "$2a$10$hJLmZbMkKepU8zfsqPF1FO72RPzNPni7XsVRR4LLHUCfWkAHx4jZG",
+    "role": "Analyst"
+  },
+  {
+    "id": 3,
+    "name": "Jayakumar",
+    "email": "jayakumar@cloudpredict.ai",
+    "password": "$2a$10$6sjR3V5NX3kZJ5.wfmGngu.N.Sf.NGXPHwkT9DTtgTr4qfdNp2GAm",
+    "role": "ML Engineer"
+  },
+  {
+    "id": 4,
+    "name": "Sampath",
+    "email": "sampath@cloudpredict.ai",
+    "password": "$2a$10$OeUCTOp60eTWn.FVYIiMeOrNOsDIlQP1x8DmqH8A6DKcgi/OJ5cVu",
+    "role": "Data Engineer"
+  },
+  {
+    "id": 5,
+    "name": "Demo User",
+    "email": "demo@cloudpredict.ai",
+    "password": "$2a$10$XAW03.pR.EyP2qbatDzWZ.hIeu7ERxOIs4Dxiy9psuiwcO6w36aGC",
+    "role": "Viewer"
+  }
+]

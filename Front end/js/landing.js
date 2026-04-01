@@ -1,0 +1,205 @@
+// ─── Landing Page JS ────────────────────────────────────────────────────────
+
+// ─── Data ───────────────────────────────────────────────────────────────────
+const features = [
+    { icon: '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>', title: 'Demand Prediction', description: 'AI models trained on historical data predict food order trends with up to 80% accuracy, helping restaurants prepare optimally.', color: '#3B82F6', bg: 'bg-blue-50 dark:bg-blue-900/10', glow: 'hover:shadow-glow-blue' },
+    { icon: '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg>', title: 'Delivery Optimization', description: 'Reduce delivery time using intelligent routing algorithms that adapt to real-time traffic conditions.', color: '#A855F7', bg: 'bg-purple-50 dark:bg-purple-900/10', glow: 'hover:shadow-glow-purple' },
+    { icon: '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>', title: 'Real-Time Analytics', description: 'Monitor platform performance instantly with live dashboards and automated alerts for anomalies.', color: '#22C55E', bg: 'bg-green-50 dark:bg-green-900/10', glow: 'hover:shadow-glow-green' },
+    { icon: '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>', title: 'Cloud Integration', description: 'Scalable cloud architecture that grows with your platform — from hundreds to millions of orders.', color: '#0EA5E9', bg: 'bg-sky-50 dark:bg-sky-900/10', glow: 'hover:shadow-glow-sky' },
+    { icon: '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>', title: 'Customer Behavior Analysis', description: 'Understand ordering patterns, preferences, and churn risk to deliver personalized experiences.', color: '#F97316', bg: 'bg-orange-50 dark:bg-orange-900/10', glow: 'hover:shadow-glow-orange' },
+    { icon: '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>', title: 'Predictive Reporting', description: 'Generate AI-powered reports with business insights and recommended actions automatically.', color: '#EC4899', bg: 'bg-pink-50 dark:bg-pink-900/10', glow: 'hover:shadow-glow-pink' },
+];
+
+const steps = [
+    { number: '01', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>', title: 'Data Collection', description: 'Collect comprehensive order, user behavior, and delivery data from multiple sources including mobile apps, POS systems, and IoT sensors.', items: ['Order histories & patterns', 'User demographics & preferences', 'Delivery GPS & timing data'] },
+    { number: '02', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>', title: 'Machine Learning Processing', description: 'Advanced ML models predict demand patterns, identify peak hours, and optimize logistics using trained neural networks and ensemble methods.', items: ['Time-series forecasting', 'Route optimization algorithms', 'Anomaly detection & alerts'] },
+    { number: '03', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>', title: 'Smart Recommendations', description: 'Actionable insights delivered to restaurant operators, delivery managers, and business stakeholders to improve efficiency and user experience.', items: ['Inventory pre-stocking alerts', 'Dynamic driver dispatch', 'Personalized customer offers'] },
+];
+
+const techs = [
+    { label: 'Python', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>', desc: 'Core ML & Backend', color: '#3B82F6' },
+    { label: 'Machine Learning', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>', desc: 'Scikit-learn, TensorFlow', color: '#F59E0B' },
+    { label: 'Cloud Computing', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>', desc: 'AWS / GCP / Azure', color: '#06B6D4' },
+    { label: 'Data Analytics', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>', desc: 'Pandas, NumPy', color: '#8B5CF6' },
+    { label: 'REST APIs', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>', desc: 'FastAPI, Flask', color: '#10B981' },
+    { label: 'Database', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>', desc: 'PostgreSQL, MongoDB', color: '#EC4899' },
+    { label: 'Real-time', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>', desc: 'Kafka, WebSockets', color: '#F97316' },
+    { label: 'Containers', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>', desc: 'Docker, Kubernetes', color: '#0EA5E9' },
+];
+
+// ─── Render lists ───────────────────────────────────────────────────────────
+function renderFeatures() {
+    const grid = document.getElementById('features-grid');
+    features.forEach((f, i) => {
+        const div = document.createElement('div');
+        div.className = `card dark:bg-dark-card dark:border-dark-border dark:shadow-none group cursor-default transition-all duration-300 ${f.glow} stagger-enter`;
+        div.style.transitionDelay = `${i * 0.08}s`;
+        div.innerHTML = `
+            <div class="w-12 h-12 rounded-2xl flex items-center justify-center mb-5 transition-all duration-300 group-hover:scale-110 group-hover:shadow-md ${f.bg}" style="color:${f.color}">
+                ${f.icon}
+            </div>
+            <h3 class="text-lg font-bold text-text-primary dark:text-dark-text mb-2">${f.title}</h3>
+            <p class="text-sm text-text-secondary dark:text-dark-text-muted leading-relaxed">${f.description}</p>
+        `;
+        grid.appendChild(div);
+    });
+}
+
+function renderSteps() {
+    const grid = document.getElementById('steps-grid');
+    steps.forEach((step, i) => {
+        const div = document.createElement('div');
+        div.className = 'relative stagger-enter';
+        div.style.transitionDelay = `${i * 0.12}s`;
+        div.innerHTML = `
+            <div class="bg-white dark:bg-dark-card rounded-3xl p-8 shadow-soft dark:shadow-none border border-gray-100 dark:border-dark-border h-full hover:shadow-medium dark:hover:border-primary/30 transition-all duration-300 hover:-translate-y-1.5">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="text-5xl font-black text-gradient opacity-25 dark:opacity-40">${step.number}</div>
+                    <div class="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary dark:text-blue-400">
+                        ${step.icon}
+                    </div>
+                </div>
+                <h3 class="text-xl font-bold text-text-primary dark:text-dark-text mb-3">${step.title}</h3>
+                <p class="text-sm text-text-secondary dark:text-dark-text-muted leading-relaxed mb-5">${step.description}</p>
+                <ul class="space-y-2">
+                    ${step.items.map(item => `
+                        <li class="flex items-center gap-2 text-sm text-text-secondary dark:text-dark-text-muted">
+                            <div class="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0"></div>
+                            ${item}
+                        </li>
+                    `).join('')}
+                </ul>
+            </div>
+        `;
+        grid.appendChild(div);
+    });
+}
+
+function renderTechs() {
+    const grid = document.getElementById('tech-grid');
+    techs.forEach((tech, i) => {
+        const div = document.createElement('div');
+        div.className = 'group bg-bg-secondary dark:bg-dark-surface rounded-2xl p-6 flex flex-col items-center text-center gap-3 cursor-default border border-transparent transition-all duration-100 hover:bg-white dark:hover:bg-dark-card hover:border-gray-100 dark:hover:border-dark-border hover:-translate-y-1.5 stagger-enter';
+        div.style.transitionDelay = `${i * 0.06}s`;
+        div.onmouseenter = function () { this.style.boxShadow = `0 0 28px ${tech.color}45, 0 10px 36px rgba(0,0,0,0.09)`; };
+        div.onmouseleave = function () { this.style.boxShadow = ''; };
+        div.innerHTML = `
+            <div class="w-14 h-14 rounded-2xl flex items-center justify-center transition-transform duration-100 group-hover:scale-110" style="background-color:${tech.color}18; color:${tech.color}">
+                ${tech.icon}
+            </div>
+            <div>
+                <div class="font-bold text-text-primary dark:text-dark-text text-sm">${tech.label}</div>
+                <div class="text-xs text-text-secondary dark:text-dark-text-muted mt-0.5">${tech.desc}</div>
+            </div>
+        `;
+        grid.appendChild(div);
+    });
+}
+
+// ─── Scroll Reveal via IntersectionObserver ──────────────────────────────────
+function setupScrollReveal() {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('revealed');
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+
+    document.querySelectorAll('.reveal, .stagger-enter').forEach(el => observer.observe(el));
+
+    // Also observe progress bars
+    const barObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const bar = entry.target;
+                const value = bar.dataset.value;
+                setTimeout(() => { bar.style.width = value + '%'; }, 200);
+            }
+        });
+    }, { threshold: 0.3 });
+
+    document.querySelectorAll('.progress-bar-fill').forEach(el => barObserver.observe(el));
+}
+
+// ─── Count-Up Animation ─────────────────────────────────────────────────────
+function setupCountUp() {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const el = entry.target;
+                const to = parseFloat(el.dataset.to);
+                const suffix = el.dataset.suffix || '';
+                const decimal = el.dataset.decimal ? parseInt(el.dataset.decimal) : 0;
+                const duration = 1800;
+                const start = performance.now();
+
+                function update(now) {
+                    const elapsed = now - start;
+                    const progress = Math.min(elapsed / duration, 1);
+                    // Ease out cubic
+                    const eased = 1 - Math.pow(1 - progress, 3);
+                    const current = to * eased;
+                    if (decimal > 0) {
+                        el.textContent = current.toFixed(decimal) + suffix;
+                    } else {
+                        el.textContent = Math.round(current) + suffix;
+                    }
+                    if (progress < 1) requestAnimationFrame(update);
+                }
+                requestAnimationFrame(update);
+                observer.unobserve(el);
+            }
+        });
+    }, { threshold: 0.5 });
+
+    document.querySelectorAll('.count-up').forEach(el => observer.observe(el));
+}
+
+// ─── Navbar scroll effect ───────────────────────────────────────────────────
+function setupNavbar() {
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 20) {
+            navbar.classList.add('glass-nav', 'shadow-soft', 'dark:bg-dark-surface/80', 'dark:backdrop-blur-md', 'dark:shadow-none', 'dark:border-b', 'dark:border-dark-border');
+            navbar.classList.remove('bg-transparent');
+        } else {
+            navbar.classList.remove('glass-nav', 'shadow-soft', 'dark:bg-dark-surface/80', 'dark:backdrop-blur-md', 'dark:shadow-none', 'dark:border-b', 'dark:border-dark-border');
+            navbar.classList.add('bg-transparent');
+        }
+    });
+}
+
+// ─── Navigation helpers ─────────────────────────────────────────────────────
+function scrollToSection(id) {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+    // Close mobile menu
+    const mobileMenu = document.getElementById('mobile-menu');
+    if (mobileMenu) mobileMenu.classList.add('hidden');
+    const menuIcon = document.getElementById('menu-icon');
+    const closeIcon = document.getElementById('close-icon');
+    if (menuIcon) menuIcon.style.display = 'block';
+    if (closeIcon) closeIcon.style.display = 'none';
+}
+
+function toggleMobileMenu() {
+    const menu = document.getElementById('mobile-menu');
+    const menuIcon = document.getElementById('menu-icon');
+    const closeIcon = document.getElementById('close-icon');
+    const isHidden = menu.classList.contains('hidden');
+    menu.classList.toggle('hidden');
+    menuIcon.style.display = isHidden ? 'none' : 'block';
+    closeIcon.style.display = isHidden ? 'block' : 'none';
+}
+
+// ─── Init ───────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+    renderFeatures();
+    renderSteps();
+    renderTechs();
+    setupScrollReveal();
+    setupCountUp();
+    setupNavbar();
+});

@@ -117,14 +117,16 @@ function renderTechs() {
                 ${tech.icon}
             </div>
             <div>
-                <div class="font-bold dark:text-dark-text text-base" style="color:#1D1D1F">${tech.label}</div>
-                <div class="text-xs dark:text-dark-text-muted mt-0.5" style="color:#515154">${tech.desc}</div>
+                <div class="font-bold text-text-primary dark:text-dark-text text-base">${tech.label}</div>
+                <div class="text-xs text-text-secondary dark:text-dark-text-muted mt-0.5">${tech.desc}</div>
             </div>
         `;
 
         card.addEventListener('click', () => {
             // Populate the back face with usage info
-            backFace.style.background = `linear-gradient(145deg, ${tech.color}12 0%, ${tech.color}22 100%)`;
+            const isDark = document.documentElement.classList.contains('dark');
+            const baseBg = isDark ? '#1F2937' : '#FFFFFF';
+            backFace.style.background = `linear-gradient(145deg, ${tech.color}12 0%, ${tech.color}22 100%), ${baseBg}`;
             backFace.style.borderColor = `${tech.color}40`;
             backFace.innerHTML = `
                 <div class="flex items-center gap-4 mb-5 w-full">
@@ -132,16 +134,16 @@ function renderTechs() {
                         ${tech.icon}
                     </div>
                     <div class="text-left">
-                        <div class="text-xl font-bold dark:text-dark-text" style="color:#1D1D1F">${tech.label}</div>
-                        <div class="text-sm dark:text-dark-text-muted" style="color:#515154">${tech.desc}</div>
+                        <div class="text-xl font-bold text-text-primary dark:text-dark-text">${tech.label}</div>
+                        <div class="text-sm text-text-secondary dark:text-dark-text-muted">${tech.desc}</div>
                     </div>
                 </div>
                 <div class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-[11px] font-bold uppercase tracking-widest mb-5 self-start" style="background:${tech.color}22; color:${tech.color}; border: 1px solid ${tech.color}45;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
                     Used in: ${tech.usedIn}
                 </div>
-                <p class="text-[15px] dark:text-dark-text-muted leading-relaxed text-left" style="color:#3a3a3c">${tech.usage}</p>
-                <div class="tech-modal-close-hint" style="color:#6E6E73">Click anywhere or press Esc to close</div>
+                <p class="text-[15px] text-text-primary dark:text-dark-text-muted leading-relaxed text-left">${tech.usage}</p>
+                <div class="tech-modal-close-hint text-text-secondary dark:text-dark-text-muted">Click anywhere or press Esc to close</div>
             `;
 
             // Show overlay → then flip to reveal the back face

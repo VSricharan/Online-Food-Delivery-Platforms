@@ -17,7 +17,7 @@ const steps = [
 ];
 
 const techs = [
-    { label: 'Python', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>', desc: 'Core ML & Backend', color: '#3B82F6', usedIn: 'Backend & ML Pipeline', usage: 'Python powers our entire machine learning pipeline — from data cleaning with Pandas to model training with Scikit-learn. It processes and transforms 2,000+ food delivery orders into actionable predictions displayed on the Dashboard.' },
+    { label: 'R Programming', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>', desc: 'Statistical Computing', color: '#3B82F6', usedIn: 'Backend & ML Pipeline', usage: 'R powers our entire statistical analysis and machine learning pipeline — from data wrangling with dplyr and tidyverse to model training with caret and randomForest. It processes and transforms 2,000+ food delivery orders into actionable predictions displayed on the Dashboard.' },
     { label: 'Machine Learning', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>', desc: 'Scikit-learn, TensorFlow', color: '#F59E0B', usedIn: 'Predictions Section', usage: 'XGBoost, Random Forest, Decision Tree, and Linear Regression models are trained and compared in the Predictions section. The ML Model Comparison table shows real accuracy, precision, recall, and F1 scores for each model.' },
     { label: 'Cloud Computing', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>', desc: 'AWS / GCP / Azure', color: '#06B6D4', usedIn: 'Settings → Cloud Integration', usage: 'Cloud provider, region, and sync frequency are all configurable in the Settings page under Cloud Integration. The backend uses cloud-ready Node.js APIs with auto-scaling and encrypted backup toggles for production readiness.' },
     { label: 'Data Analytics', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>', desc: 'Pandas, NumPy', color: '#8B5CF6', usedIn: 'Analytics Section', usage: 'The Analytics dashboard visualizes city-wise performance, platform distribution, customer satisfaction trends, and high-demand areas — all powered by Pandas/NumPy data processing from Power BI CSV exports.' },
@@ -107,41 +107,41 @@ function renderTechs() {
     // ── Render grid cards ──
     techs.forEach((tech, i) => {
         const card = document.createElement('div');
-        card.className = 'tech-grid-card group bg-bg-secondary dark:bg-dark-surface rounded-2xl p-6 flex flex-col items-center text-center gap-3 border border-gray-200 dark:border-transparent hover:border-gray-300 dark:hover:border-dark-border stagger-enter';
+        card.className = 'tech-grid-card group bg-bg-secondary dark:bg-dark-surface rounded-2xl p-6 flex flex-col items-center text-center gap-3 border border-gray-200/80 dark:border-transparent hover:border-gray-300 dark:hover:border-dark-border shadow-sm stagger-enter';
         card.style.transitionDelay = `${i * 0.06}s`;
         card.onmouseenter = function () { this.style.boxShadow = `0 0 28px ${tech.color}35, 0 10px 36px rgba(0,0,0,0.08)`; };
         card.onmouseleave = function () { this.style.boxShadow = ''; };
 
         card.innerHTML = `
-            <div class="w-14 h-14 rounded-2xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110" style="background-color:${tech.color}15; color:${tech.color}">
+            <div class="w-14 h-14 rounded-2xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110" style="background-color:${tech.color}28; color:${tech.color}">
                 ${tech.icon}
             </div>
             <div>
-                <div class="font-bold text-text-primary dark:text-dark-text text-sm">${tech.label}</div>
-                <div class="text-xs text-text-secondary dark:text-dark-text-muted mt-0.5">${tech.desc}</div>
+                <div class="font-bold dark:text-dark-text text-base" style="color:#1D1D1F">${tech.label}</div>
+                <div class="text-xs dark:text-dark-text-muted mt-0.5" style="color:#515154">${tech.desc}</div>
             </div>
         `;
 
         card.addEventListener('click', () => {
             // Populate the back face with usage info
-            backFace.style.background = `linear-gradient(145deg, ${tech.color}06 0%, ${tech.color}14 100%)`;
-            backFace.style.borderColor = `${tech.color}30`;
+            backFace.style.background = `linear-gradient(145deg, ${tech.color}12 0%, ${tech.color}22 100%)`;
+            backFace.style.borderColor = `${tech.color}40`;
             backFace.innerHTML = `
                 <div class="flex items-center gap-4 mb-5 w-full">
-                    <div class="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0" style="background-color:${tech.color}18; color:${tech.color}">
+                    <div class="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0" style="background-color:${tech.color}28; color:${tech.color}">
                         ${tech.icon}
                     </div>
                     <div class="text-left">
-                        <div class="text-xl font-bold text-text-primary dark:text-dark-text">${tech.label}</div>
-                        <div class="text-sm text-text-secondary dark:text-dark-text-muted">${tech.desc}</div>
+                        <div class="text-xl font-bold dark:text-dark-text" style="color:#1D1D1F">${tech.label}</div>
+                        <div class="text-sm dark:text-dark-text-muted" style="color:#515154">${tech.desc}</div>
                     </div>
                 </div>
-                <div class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-[11px] font-bold uppercase tracking-widest mb-5 self-start" style="background:${tech.color}15; color:${tech.color}; border: 1px solid ${tech.color}35;">
+                <div class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-[11px] font-bold uppercase tracking-widest mb-5 self-start" style="background:${tech.color}22; color:${tech.color}; border: 1px solid ${tech.color}45;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
                     Used in: ${tech.usedIn}
                 </div>
-                <p class="text-base text-text-secondary dark:text-dark-text-muted leading-relaxed text-left">${tech.usage}</p>
-                <div class="tech-modal-close-hint text-text-secondary dark:text-dark-text-muted">Click anywhere or press Esc to close</div>
+                <p class="text-[15px] dark:text-dark-text-muted leading-relaxed text-left" style="color:#3a3a3c">${tech.usage}</p>
+                <div class="tech-modal-close-hint" style="color:#6E6E73">Click anywhere or press Esc to close</div>
             `;
 
             // Show overlay → then flip to reveal the back face

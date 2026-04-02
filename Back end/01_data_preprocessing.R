@@ -26,7 +26,7 @@ cat("=== All packages loaded successfully ===\n\n")
 # SECTION 2: LOAD THE DATASET
 # ==============================================================================
 
-file_path <- "Book1_expanded_2000 - Book1_expanded_2000.csv.csv"
+file_path <- "/Users/sricharan/Desktop/4-2 project/Book1_expanded_2000 updated.csv"
 
 if (!file.exists(file_path)) {
   stop("ERROR: File not found! Please update 'file_path' variable with the correct path.")

@@ -478,7 +478,7 @@ html.dark .toggle-switch.off {
     border-radius: 9999px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
     transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
-                box-shadow 0.3s ease;
+        box-shadow 0.3s ease;
 }
 
 .toggle-switch.on .toggle-knob {
@@ -673,59 +673,133 @@ html.dark .toggle-switch.off {
 
 /* ─── #1: Section Content Transition ─────────────────────────────────────── */
 @keyframes sectionEnter {
-    0% { opacity: 0; transform: translateY(18px) scale(0.995); }
-    100% { opacity: 1; transform: translateY(0) scale(1); }
+    0% {
+        opacity: 0;
+        transform: translateY(18px) scale(0.995);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
+
 .animate-section-enter {
     animation: sectionEnter 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 /* ─── #3: KPI Stat Card Staggered Entrance ───────────────────────────────── */
 @keyframes statCardEnter {
-    0% { opacity: 0; transform: translateY(24px) scale(0.96); }
-    60% { opacity: 1; transform: translateY(-4px) scale(1.01); }
-    100% { opacity: 1; transform: translateY(0) scale(1); }
+    0% {
+        opacity: 0;
+        transform: translateY(24px) scale(0.96);
+    }
+
+    60% {
+        opacity: 1;
+        transform: translateY(-4px) scale(1.01);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
+
 .stat-card-animate {
     opacity: 0;
     animation: statCardEnter 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
-.stat-card-animate:nth-child(1) { animation-delay: 0.05s; }
-.stat-card-animate:nth-child(2) { animation-delay: 0.12s; }
-.stat-card-animate:nth-child(3) { animation-delay: 0.19s; }
-.stat-card-animate:nth-child(4) { animation-delay: 0.26s; }
+
+.stat-card-animate:nth-child(1) {
+    animation-delay: 0.05s;
+}
+
+.stat-card-animate:nth-child(2) {
+    animation-delay: 0.12s;
+}
+
+.stat-card-animate:nth-child(3) {
+    animation-delay: 0.19s;
+}
+
+.stat-card-animate:nth-child(4) {
+    animation-delay: 0.26s;
+}
 
 /* ─── #6: Toast Slide-in from Top ────────────────────────────────────────── */
 @keyframes toastSlideIn {
-    0% { opacity: 0; transform: translateY(-20px) scale(0.95); }
-    50% { opacity: 1; transform: translateY(4px) scale(1.01); }
-    100% { opacity: 1; transform: translateY(0) scale(1); }
+    0% {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
+    }
+
+    50% {
+        opacity: 1;
+        transform: translateY(4px) scale(1.01);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
+
 @keyframes toastSlideOut {
-    0% { opacity: 1; transform: translateY(0) scale(1); }
-    100% { opacity: 0; transform: translateY(-16px) scale(0.96); }
+    0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(-16px) scale(0.96);
+    }
 }
+
 .toast-enter {
     animation: toastSlideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
+
 .toast-exit {
     animation: toastSlideOut 0.3s cubic-bezier(0.4, 0, 1, 1) forwards;
 }
 
 /* ─── #11/#12: Dropdown Spring Animation ─────────────────────────────────── */
 @keyframes dropdownSpring {
-    0% { opacity: 0; transform: scale(0.9) translateY(-8px); }
-    60% { opacity: 1; transform: scale(1.02) translateY(2px); }
-    100% { opacity: 1; transform: scale(1) translateY(0); }
+    0% {
+        opacity: 0;
+        transform: scale(0.9) translateY(-8px);
+    }
+
+    60% {
+        opacity: 1;
+        transform: scale(1.02) translateY(2px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
 }
+
 @keyframes dropdownClose {
-    0% { opacity: 1; transform: scale(1) translateY(0); }
-    100% { opacity: 0; transform: scale(0.92) translateY(-6px); }
+    0% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+
+    100% {
+        opacity: 0;
+        transform: scale(0.92) translateY(-6px);
+    }
 }
+
 .dropdown-spring-enter {
     animation: dropdownSpring 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
     transform-origin: top right;
 }
+
 .dropdown-spring-exit {
     animation: dropdownClose 0.2s cubic-bezier(0.4, 0, 1, 1) forwards;
     transform-origin: top right;
@@ -870,6 +944,7 @@ html.dark .custom-tooltip {
     cursor: pointer;
     transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.35s ease;
 }
+
 .tech-grid-card:hover {
     transform: translateY(-6px) scale(1.03);
 }
@@ -889,10 +964,12 @@ html.dark .custom-tooltip {
     pointer-events: none;
     transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
 .tech-overlay.visible {
     opacity: 1;
     pointer-events: auto;
 }
+
 html.dark .tech-overlay {
     background: rgba(0, 0, 0, 0.55);
 }
@@ -906,8 +983,9 @@ html.dark .tech-overlay {
     transform: scale(0.85);
     opacity: 0;
     transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
-                opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
 .tech-overlay.visible .tech-modal-card {
     transform: scale(1);
     opacity: 1;
@@ -920,6 +998,7 @@ html.dark .tech-overlay {
     transform-style: preserve-3d;
     transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
 .tech-modal-card.flipped .tech-modal-inner {
     transform: rotateY(180deg);
 }
@@ -942,13 +1021,14 @@ html.dark .tech-overlay {
 .tech-modal-front {
     z-index: 2;
     padding: 2.5rem;
-    background: #EBEBEF;
-    border: 1px solid rgba(0,0,0,0.12);
-    box-shadow: 0 30px 70px rgba(0,0,0,0.22), 0 0 0 1px rgba(255,255,255,0.08) inset;
+    background: #F5F5F7;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
 }
+
 html.dark .tech-modal-front {
     background: #1F2937;
-    border-color: rgba(255,255,255,0.08);
+    border-color: rgba(255, 255, 255, 0.08);
 }
 
 .tech-modal-back {
@@ -958,12 +1038,13 @@ html.dark .tech-modal-front {
     justify-content: flex-start;
     padding-top: 3rem;
     background: #FFFFFF;
-    border: 1px solid rgba(0,0,0,0.12);
-    box-shadow: 0 30px 70px rgba(0,0,0,0.22), 0 0 0 1px rgba(255,255,255,0.08) inset;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
 }
+
 html.dark .tech-modal-back {
     background: #1F2937;
-    border-color: rgba(255,255,255,0.08);
+    border-color: rgba(255, 255, 255, 0.08);
 }
 
 /* Close hint */
@@ -981,19 +1062,42 @@ html.dark .tech-modal-back {
 
 /* ─── #8: Navbar Logo Glow on Hover ──────────────────────────────────────── */
 @keyframes logoGlow {
-    0%, 100% { box-shadow: 0 2px 8px rgba(10, 132, 255, 0.3); }
-    50% { box-shadow: 0 4px 20px rgba(10, 132, 255, 0.55), 0 0 40px rgba(10, 132, 255, 0.15); }
+
+    0%,
+    100% {
+        box-shadow: 0 2px 8px rgba(10, 132, 255, 0.3);
+    }
+
+    50% {
+        box-shadow: 0 4px 20px rgba(10, 132, 255, 0.55), 0 0 40px rgba(10, 132, 255, 0.15);
+    }
 }
+
 .logo-icon-hover:hover {
     animation: logoGlow 1.5s ease-in-out infinite;
 }
 
 /* ─── #13: Login Success Celebration ─────────────────────────────────────── */
 @keyframes loginSuccess {
-    0% { opacity: 1; transform: scale(1); filter: brightness(1); }
-    40% { opacity: 1; transform: scale(1.02); filter: brightness(1.15); }
-    100% { opacity: 0; transform: scale(0.95); filter: brightness(1.3); }
+    0% {
+        opacity: 1;
+        transform: scale(1);
+        filter: brightness(1);
+    }
+
+    40% {
+        opacity: 1;
+        transform: scale(1.02);
+        filter: brightness(1.15);
+    }
+
+    100% {
+        opacity: 0;
+        transform: scale(0.95);
+        filter: brightness(1.3);
+    }
 }
+
 .login-success-exit {
     animation: loginSuccess 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
     pointer-events: none;

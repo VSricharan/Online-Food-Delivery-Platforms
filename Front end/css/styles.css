@@ -942,9 +942,9 @@ html.dark .tech-overlay {
 .tech-modal-front {
     z-index: 2;
     padding: 2.5rem;
-    background: #F5F5F7;
-    border: 1px solid rgba(0,0,0,0.08);
-    box-shadow: 0 25px 60px rgba(0,0,0,0.15), 0 0 0 1px rgba(255,255,255,0.05) inset;
+    background: #EBEBEF;
+    border: 1px solid rgba(0,0,0,0.12);
+    box-shadow: 0 30px 70px rgba(0,0,0,0.22), 0 0 0 1px rgba(255,255,255,0.08) inset;
 }
 html.dark .tech-modal-front {
     background: #1F2937;
@@ -958,8 +958,8 @@ html.dark .tech-modal-front {
     justify-content: flex-start;
     padding-top: 3rem;
     background: #FFFFFF;
-    border: 1px solid rgba(0,0,0,0.08);
-    box-shadow: 0 25px 60px rgba(0,0,0,0.15), 0 0 0 1px rgba(255,255,255,0.05) inset;
+    border: 1px solid rgba(0,0,0,0.12);
+    box-shadow: 0 30px 70px rgba(0,0,0,0.22), 0 0 0 1px rgba(255,255,255,0.08) inset;
 }
 html.dark .tech-modal-back {
     background: #1F2937;

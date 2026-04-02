@@ -57,7 +57,32 @@
     "name": "Demo User",
     "email": "demo@cloudpredict.ai",
     "password": "$2a$10$XAW03.pR.EyP2qbatDzWZ.hIeu7ERxOIs4Dxiy9psuiwcO6w36aGC",
-    "role": "Viewer"
+    "role": "Viewer",
+    "institution": "CloudPredict AI",
+    "settings": {
+      "mlModel": "Linear Regression (LM)",
+      "mlHorizon": "30 Days",
+      "mlConfidence": "99%",
+      "cloudProvider": "Amazon Web Services (AWS)",
+      "cloudRegion": "Asia Pacific — Mumbai (ap-south-1)",
+      "cloudSync": "Every 5 minutes",
+      "dataRetention": "90 Days",
+      "mlAuto": true,
+      "mlFeat": true,
+      "mlAnomaly": true,
+      "cloudScale": true,
+      "cloudBackup": true,
+      "cloudEncrypt": true,
+      "notifDemand": true,
+      "notifRetrain": true,
+      "notifDelivery": true,
+      "notifSystem": true,
+      "notifEmail": false,
+      "notifSms": false,
+      "dataAnon": true,
+      "dataShare": false,
+      "dataGdpr": true
+    }
   },
   {
     "id": 1775049778636,

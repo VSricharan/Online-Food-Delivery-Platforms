@@ -107,7 +107,7 @@ function renderTechs() {
     // ── Render grid cards ──
     techs.forEach((tech, i) => {
         const card = document.createElement('div');
-        card.className = 'tech-grid-card group bg-bg-secondary dark:bg-dark-surface rounded-2xl p-6 flex flex-col items-center text-center gap-3 border border-transparent hover:border-gray-200 dark:hover:border-dark-border stagger-enter';
+        card.className = 'tech-grid-card group bg-bg-secondary dark:bg-dark-surface rounded-2xl p-6 flex flex-col items-center text-center gap-3 border border-gray-200 dark:border-transparent hover:border-gray-300 dark:hover:border-dark-border stagger-enter';
         card.style.transitionDelay = `${i * 0.06}s`;
         card.onmouseenter = function () { this.style.boxShadow = `0 0 28px ${tech.color}35, 0 10px 36px rgba(0,0,0,0.08)`; };
         card.onmouseleave = function () { this.style.boxShadow = ''; };

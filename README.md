@@ -14,7 +14,7 @@ A professional analytics dashboard for a food delivery platform, featuring predi
 4. Open `Front end/index.html` in your browser
 
 ## Contributors
-- **Vobilisetti SriCharan** ([VSricharan](https://github.com/VSricharan)) - Project Lead
-- **V. Hamsavalli** ([Hamsavall](https://github.com/Hamsavall)) - Data Analyst
-- **U. Sampath** ([uppulurisampath-collab](https://github.com/uppulurisampath-collab)) - Data Engineer
-- **Vegi Jayakumar** ([Vegi-Jayakumar](https://github.com/Vegi-Jayakumar)) - ML Engineer
+- **Vobilisetti SriCharan** ([VSricharan](https://github.com/VSricharan))
+- **V. Hamsavalli** ([Hamsavall](https://github.com/Hamsavall))
+- **U. Sampath** ([uppulurisampath-collab](https://github.com/uppulurisampath-collab))
+- **Vegi Jayakumar** ([Vegi-Jayakumar](https://github.com/Vegi-Jayakumar))

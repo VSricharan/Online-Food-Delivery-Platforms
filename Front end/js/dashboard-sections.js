@@ -125,7 +125,7 @@ async function loadPredictions() {
     el.innerHTML = '<div class="flex items-center justify-center h-96"><div class="w-10 h-10 border-4 border-purple-400 border-t-transparent rounded-full animate-spin"></div></div>';
     try {
         const data = await apiGetPredictions();
-        const MC = { 'XGBoost (Ensemble)': '#34C759', 'Random Forest (RF)': '#0A84FF', 'Decision Tree': '#FF9F0A', 'Linear Regression (LM)': '#AF52DE' };
+        const MC = { 'XGBoost (Ensemble)': '#34C759', 'C5.0 (Rule-Based)': '#FF2D55', 'Random Forest (RF)': '#0A84FF', 'Decision Tree': '#FF9F0A', 'Linear Regression (LM)': '#AF52DE' };
         const BC = ['#0A84FF', '#AF52DE', '#34C759', '#FF9F0A', '#5AC8FA'];
         el.innerHTML = `<div class="space-y-6 animate-fade-in">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">

@@ -69,7 +69,7 @@ router.get('/', (req, res) => {
     
     // We support standard model list to match UI and actual regression models evaluated
     const models = [
-        { name: 'XGBoost (Ensemble)', accuracy: 0.95, precision: 0.94, recall: 0.96, f1Score: 0.95, aucRoc: 0.97 },
+        { name: 'C5.0 (Rule-Based)', accuracy: 0.90, precision: 0.912, recall: 0.894, f1Score: 0.903, aucRoc: 0.9615 },
         { name: 'Random Forest (RF)', accuracy: 0.92, precision: 0.91, recall: 0.93, f1Score: 0.92, aucRoc: 0.94 },
         { name: 'Decision Tree', accuracy: 0.86, precision: 0.84, recall: 0.87, f1Score: 0.85, aucRoc: 0.88 },
         { name: 'Linear Regression (LM)', accuracy: 0.81, precision: 0.79, recall: 0.82, f1Score: 0.80, aucRoc: 0.85 }
